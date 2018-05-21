@@ -12,4 +12,11 @@ public interface Constant {
         int IS_ENABLE = 2;
         int IS_NOT_ENABLE = 1;
     }
+    interface PAGE {
+        int DEFAULT_PAGE_SIZE = 20;
+        int DEFAULT_PAGE_NUM = 1;
+    }
+    interface ORDER {
+        String DEFAULT_SISUATION = "待拨打";
+    }
 }

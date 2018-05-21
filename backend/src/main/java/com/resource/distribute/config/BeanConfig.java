@@ -15,7 +15,8 @@ import tk.mybatis.spring.mapper.MapperScannerConfigurer;
  *
  * @author lengrongfu
  * @create 2018年01月12日上午8:03
- * @see </P>
+ * @see
+ *      </P>
  */
 @Configuration
 public class BeanConfig {
@@ -25,8 +26,7 @@ public class BeanConfig {
         MapperScannerConfigurer configurer = new MapperScannerConfigurer();
         configurer.setBasePackage("com.resource.distribute.dao");
         Properties properties = new Properties();
-        // properties.setProperty("mappers", "com.dikong.lightcontroller.dao.ManagerTypeMenuDao");
-        // properties.setProperty("mappers", "com.dikong.lightcontroller.dao.EquipmentMonitorDao");
+        properties.setProperty("mappers", "com.resource.distribute.dao.OrderDao");
         configurer.setProperties(properties);
         return configurer;
     }

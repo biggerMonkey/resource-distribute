@@ -1,13 +1,15 @@
 package com.resource.distribute.dto;
 
+import com.resource.distribute.common.Constant;
+
 /**
  * @author huangwenjun
  * @Date 2018年5月21日
  */
 public class QueryMobileReq {
-    private String mobileJobNumber;
-    private int pageSize = 20;
-    private int pageNum = 1;
+    private String mobileJobNumber = "";
+    private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
+    private int pageNum = Constant.PAGE.DEFAULT_PAGE_NUM;
 
 
     public String getMobileJobNumber() {

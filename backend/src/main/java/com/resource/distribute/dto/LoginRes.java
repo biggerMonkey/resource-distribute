@@ -8,6 +8,7 @@ import com.resource.distribute.entity.User;
  */
 public class LoginRes {
     private String token;
+    private String mobileJobNum;
     private User userInfo;
 
     public LoginRes() {
@@ -36,8 +37,17 @@ public class LoginRes {
         this.userInfo = userInfo;
     }
 
+    public String getMobileJobNum() {
+        return mobileJobNum;
+    }
+
+    public void setMobileJobNum(String mobileJobNum) {
+        this.mobileJobNum = mobileJobNum;
+    }
+
     @Override
     public String toString() {
-        return "LoginRes [token=" + token + ", userInfo=" + userInfo + "]";
+        return "LoginRes [token=" + token + ", mobileJobNum=" + mobileJobNum + ", userInfo="
+                + userInfo + "]";
     }
 }

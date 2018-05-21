@@ -29,7 +29,7 @@ public class Init implements CommandLineRunner {
         String maxJobNo = userDao.getMaxJobNo();
         LOG.info("maxMenuNo=" + maxJobNo);
         if (StringUtils.isEmpty(maxJobNo)) {
-            DB.maxUserJobNumber = "100000";
+            DB.maxUserJobNumber = "100001";
         } else {
             DB.maxUserJobNumber = maxJobNo;
         }

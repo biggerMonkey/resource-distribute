@@ -102,6 +102,16 @@
 			<version>2.5.0</version>
 		</dependency>
 		<!--swagger2 end-->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.17</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.17</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>resource-distribute</finalName>

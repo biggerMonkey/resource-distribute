@@ -2,6 +2,8 @@ package com.resource.distribute.utils;
 
 import java.util.Objects;
 
+import org.springframework.util.StringUtils;
+
 import com.resource.distribute.common.Constant;
 import com.resource.distribute.dto.LoginRes;
 
@@ -37,6 +39,14 @@ public class AuthCurrentUser {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public static String getMobileJobNum() {
+        if (StringUtils.isEmpty(get().getMobileJobNum())) {
+            return "";
+        } else {
+            return get().getMobileJobNum();
         }
     }
 }
