@@ -1,5 +1,10 @@
 package com.resource.distribute.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.resource.distribute.dto.LoginRes;
+
 
 /**
  * @author huangwenjun
@@ -7,4 +12,5 @@ package com.resource.distribute.common;
  */
 public class DB {
     public static String maxUserJobNumber = "";
+    public static Map<String, LoginRes> users = new HashMap<String, LoginRes>();
 }

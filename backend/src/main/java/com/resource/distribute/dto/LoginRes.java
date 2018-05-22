@@ -1,5 +1,7 @@
 package com.resource.distribute.dto;
 
+import java.util.Date;
+
 import com.resource.distribute.entity.User;
 
 /**
@@ -10,6 +12,7 @@ public class LoginRes {
     private String token;
     private String mobileJobNum;
     private User userInfo;
+    private Date loginTime;
 
     public LoginRes() {
         super();
@@ -43,6 +46,14 @@ public class LoginRes {
 
     public void setMobileJobNum(String mobileJobNum) {
         this.mobileJobNum = mobileJobNum;
+    }
+
+    public Date getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLoginTime(Date loginTime) {
+        this.loginTime = loginTime;
     }
 
     @Override

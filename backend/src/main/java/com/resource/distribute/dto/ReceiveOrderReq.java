@@ -9,10 +9,11 @@ public class ReceiveOrderReq {
     private String mainMeal;
     private String secondMeal;
     private String upValue;
+    private Integer startValue;
+    private Integer endValue;
     private Integer broadband;// 1->是 2->否
     private String mobileNumber;
     private Integer orderNum;
-
 
     public Integer getAreaId() {
         return areaId;
@@ -46,6 +47,22 @@ public class ReceiveOrderReq {
         this.upValue = upValue;
     }
 
+    public Integer getStartValue() {
+        return startValue;
+    }
+
+    public void setStartValue(Integer startValue) {
+        this.startValue = startValue;
+    }
+
+    public Integer getEndValue() {
+        return endValue;
+    }
+
+    public void setEndValue(Integer endValue) {
+        this.endValue = endValue;
+    }
+
     public Integer getBroadband() {
         return broadband;
     }
@@ -73,7 +90,8 @@ public class ReceiveOrderReq {
     @Override
     public String toString() {
         return "ReceiveOrderReq [areaId=" + areaId + ", mainMeal=" + mainMeal + ", secondMeal="
-                + secondMeal + ", upValue=" + upValue + ", broadband=" + broadband
-                + ", mobileNumber=" + mobileNumber + ", orderNum=" + orderNum + "]";
+                + secondMeal + ", upValue=" + upValue + ", startValue=" + startValue
+                + ", endValue=" + endValue + ", broadband=" + broadband + ", mobileNumber="
+                + mobileNumber + ", orderNum=" + orderNum + "]";
     }
 }

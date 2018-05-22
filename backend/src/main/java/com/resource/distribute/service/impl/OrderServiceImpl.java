@@ -31,8 +31,6 @@ import com.resource.distribute.entity.MobileOrder;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
 
-import tk.mybatis.mapper.entity.Example;
-
 /**
  * @author huangwenjun
  * @version 2018年5月21日 下午9:53:54
@@ -56,21 +54,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ReturnInfo listOrder(OrderQueryReq queryReq) {
-        Example example = new Example(MobileOrder.class);
-        if (queryReq.getAreaId() != null) {
-            example.createCriteria().andEqualTo("areaId", queryReq.getAreaId());
-        }
-        if (!StringUtils.isEmpty(queryReq.getHandSituation())) {
-            example.createCriteria().andEqualTo("handSituation", queryReq.getHandSituation());
-        }
-        if (!StringUtils.isEmpty(queryReq.getStartTime())) {
-            example.createCriteria().andGreaterThanOrEqualTo("updateTime", queryReq.getEndTime());
-        }
-        if (!StringUtils.isEmpty(queryReq.getEndTime())) {
-            example.createCriteria().andLessThan("updateTime", queryReq.getEndTime());
-        }
         PageHelper.startPage(queryReq.getPageNum(), queryReq.getPageSize());
-        List<MobileOrder> orders = orderDao.selectByExample(example);
+        List<MobileOrder> orders = orderDao.listOrder(queryReq);
         return ReturnInfo.createReturnSucces(orders);
     }
 
@@ -163,16 +148,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public synchronized ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
-        Example example = new Example(MobileOrder.class);
-        if (receiveOrderReq.getAreaId() != null) {
-            example.createCriteria().andEqualTo("areaId", receiveOrderReq.getAreaId());
-        }
-        if (!StringUtils.isEmpty(receiveOrderReq.getMainMeal())) {
-            example.createCriteria().andEqualTo("mainMeal", receiveOrderReq.getMainMeal());
-        }
-        if (!StringUtils.isEmpty(receiveOrderReq.getSecondMeal())) {
-            example.createCriteria().andEqualTo("secondMeal", receiveOrderReq.getSecondMeal());
-        }
         if (!StringUtils.isEmpty(receiveOrderReq.getUpValue())) {
             String upValue = receiveOrderReq.getUpValue().trim();
             String upNum = "0";
@@ -187,33 +162,21 @@ public class OrderServiceImpl implements OrderService {
             }
             Integer startValue = Integer.valueOf(upNum);
             if (upValue.indexOf("上") != -1) {
-                example.createCriteria().andGreaterThan("upValue", startValue);
+                receiveOrderReq.setStartValue(startValue);
             } else if (upValue.indexOf("下") != -1) {
-                example.createCriteria().andLessThan("upValue", startValue);
+                receiveOrderReq.setEndValue(startValue);
             } else {
                 int endValue =
                         Integer.valueOf(upValue.split(String.valueOf(upValue.charAt(flag)))[1]);
-                example.createCriteria().andGreaterThanOrEqualTo("upValue", startValue)
-                        .andLessThanOrEqualTo("upValue", endValue);
+                receiveOrderReq.setStartValue(startValue);
+                receiveOrderReq.setEndValue(endValue);
             }
-        }
-        if (!StringUtils.isEmpty(receiveOrderReq.getBroadband())) {
-            if (receiveOrderReq.getBroadband().equals("1")) {
-                example.createCriteria().andNotEqualTo("broadband", "");
-            } else {
-                example.createCriteria().andEqualTo("broadband", "");
-            }
-        }
-        if (!StringUtils.isEmpty(receiveOrderReq.getMainMeal())) {
-            example.createCriteria().andLike("mobileNumber",
-                    "%" + receiveOrderReq.getMobileNumber() + "%");
         }
         PageHelper.startPage(1, 20);
-        List<MobileOrder> orders = orderDao.selectByExample(example);
+        List<MobileOrder> orders = orderDao.recieveListOrder(receiveOrderReq);
         if (receiveOrderReq.getOrderNum() == null) {
             return ReturnInfo.createReturnSucces(orders);
         }
         return ReturnInfo.createReturnSucces(orders);
     }
-
 }

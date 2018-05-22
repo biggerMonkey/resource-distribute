@@ -11,6 +11,7 @@ public interface Constant {
         int IS_NOT_DELETE = 2;
         int IS_ENABLE = 2;
         int IS_NOT_ENABLE = 1;
+        String TOKEN = "token";
     }
     interface PAGE {
         int DEFAULT_PAGE_SIZE = 20;

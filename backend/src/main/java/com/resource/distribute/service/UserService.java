@@ -1,6 +1,7 @@
 package com.resource.distribute.service;
 
 import com.resource.distribute.common.ReturnInfo;
+import com.resource.distribute.dto.LoginReq;
 import com.resource.distribute.dto.QueryUserReq;
 import com.resource.distribute.entity.User;
 
@@ -16,4 +17,8 @@ public interface UserService {
     public ReturnInfo delUser(Integer userId);
 
     public ReturnInfo listUsers(QueryUserReq queryUserReq);
+
+    public ReturnInfo login(LoginReq loginReq);
+
+    public ReturnInfo checkMobile(String token, String mobileJonNumber);
 }
