@@ -46,6 +46,11 @@ public class OrderController {
         return orderService.listOrder(queryReq);
     }
 
+    @PostMapping("/receive/search")
+    public ReturnInfo receiveOrderSearch(@RequestBody ReceiveOrderReq receiveOrderReq) {
+        return orderService.receiveOrderSearch(receiveOrderReq);
+    }
+
     @PostMapping("/receive")
     public ReturnInfo receiveOrder(@RequestBody ReceiveOrderReq receiveOrderReq) {
         return orderService.receiveOrder(receiveOrderReq);

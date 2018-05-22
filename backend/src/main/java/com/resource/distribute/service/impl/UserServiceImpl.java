@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import tk.mybatis.mapper.entity.Example;
-
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
@@ -25,6 +23,8 @@ import com.resource.distribute.entity.User;
 import com.resource.distribute.service.UserService;
 import com.resource.distribute.utils.AuthCurrentUser;
 import com.resource.distribute.utils.MD5Util;
+
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
         Example example = new Example(User.class);
         example.createCriteria().andEqualTo("jobNumber", loginReq.getJobNumber())
                 .andEqualTo("isDelete", Constant.USER.IS_NOT_DELETE)
-                .andEqualTo("isEnable", Constant.USER.IS_NOT_ENABLE);
+                .andEqualTo("isEnable", Constant.USER.IS_ENABLE);
         List<User> users = userDao.selectByExample(example);
         if (users == null || users.size() != 1) {
             return ReturnInfo.create(CodeEnum.LOGIN_FAIL);
@@ -123,8 +123,11 @@ public class UserServiceImpl implements UserService {
         example.createCriteria().andEqualTo("mobileJobNumber", mobileJonNumber);
         List<MobileJobNumber> mobileJobNumbers = mobileDao.selectByExample(example);
         if (mobileJobNumbers == null || mobileJobNumbers.size() != 1) {
-            return ReturnInfo.create(CodeEnum.LOGIN_FAIL);
+            DB.users.remove(token);
+            return ReturnInfo.create(CodeEnum.MOBILE_JOB_NUM_ERROR);
         }
+        loginRes.setMobileJobNum(mobileJonNumber);
+        DB.users.put(token, loginRes);
         return ReturnInfo.createReturnSuccessOne(null);
     }
 }

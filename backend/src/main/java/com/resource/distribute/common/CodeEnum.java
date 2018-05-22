@@ -15,13 +15,13 @@ public enum CodeEnum {
     NOCOMPETENCE(-8, "无权限访问"),
     LOGIN_FAIL(-9, "账号或密码错误"),
     NO_LOGIN(-10, "用户过期或处在无登录状态"),
-    SIGN_ERROR(-11, "验证签名错误"),
+    MOBILE_JOB_NUM_ERROR(-11, "移动工号错误,请重新登陆"),
     DATA_INVALID(-12, "存在不合法数据"),
     SAME_LOAN(-13, "存在正在流程中的相同身份证号码的贷款"),
     NOTHING_DELETE(-14, "删除暂存信息失败,未找到匹配内容"),
     USER_EXIST(-15, "用户已存在"),
     OLD_PWD_ERROR(-16, "旧密码错误"),
-    PWD_FORMAT_ERROR(-17,"密码长度最少6位");
+    PWD_FORMAT_ERROR(-17, "密码长度最少6位");
 
     private int code;
 

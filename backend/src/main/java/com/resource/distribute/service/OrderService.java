@@ -20,5 +20,7 @@ public interface OrderService {
 
     public ReturnInfo listOrder(OrderQueryReq queryReq);
 
+    public ReturnInfo receiveOrderSearch(ReceiveOrderReq receiveOrderReq);
+
     public ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq);
 }

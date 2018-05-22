@@ -23,11 +23,14 @@ import com.resource.distribute.common.Constant;
 import com.resource.distribute.common.ReturnInfo;
 import com.resource.distribute.dao.AreaDao;
 import com.resource.distribute.dao.OrderDao;
+import com.resource.distribute.dao.RecordDao;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
 import com.resource.distribute.entity.Area;
 import com.resource.distribute.entity.MobileOrder;
+import com.resource.distribute.entity.Record;
+import com.resource.distribute.entity.User;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
 
@@ -44,18 +47,28 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private AreaDao areaDao;
 
+    @Autowired
+    private RecordDao recordDao;
+
     @Override
     public ReturnInfo updateOrder(OrderUpdateReq orderReq) {
         MobileOrder order = new MobileOrder();
         BeanUtils.copyProperties(orderReq, order);
+        order.setUpdateBy(AuthCurrentUser.getUserId());
         orderDao.updateByPrimaryKeySelective(order);
+        insertRecord("更新", orderReq.getId());
         return ReturnInfo.createReturnSuccessOne(null);
     }
 
     @Override
     public ReturnInfo listOrder(OrderQueryReq queryReq) {
         PageHelper.startPage(queryReq.getPageNum(), queryReq.getPageSize());
-        List<MobileOrder> orders = orderDao.listOrder(queryReq);
+        List<MobileOrder> orders = new ArrayList<MobileOrder>();
+        if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
+            orders = orderDao.listOrder(queryReq, null);
+        } else {
+            orders = orderDao.listOrder(queryReq, Constant.USER.NOT_ADMIN);
+        }
         return ReturnInfo.createReturnSucces(orders);
     }
 
@@ -147,7 +160,27 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public synchronized ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
+    public synchronized ReturnInfo receiveOrderSearch(ReceiveOrderReq receiveOrderReq) {
+
+        return ReturnInfo.createReturnSucces(searchOrder(receiveOrderReq));
+    }
+
+    @Override
+    public ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
+        receiveOrderReq.setPageSize(receiveOrderReq.getOrderNum());
+        List<MobileOrder> orders = searchOrder(receiveOrderReq);
+        User user = AuthCurrentUser.get().getUserInfo();
+        for (MobileOrder order : orders) {
+            order.setMobileJobNumber(AuthCurrentUser.getMobileJobNum());
+            order.setJobNumber(user.getJobNumber());
+            order.setUserName(user.getUserName());
+            orderDao.updateByPrimaryKeySelective(order);
+        }
+        insertRecord("领取单子:" + orders.size(), null);
+        return ReturnInfo.createReturnSuccessOne(orders.size());
+    }
+
+    private List<MobileOrder> searchOrder(ReceiveOrderReq receiveOrderReq) {
         if (!StringUtils.isEmpty(receiveOrderReq.getUpValue())) {
             String upValue = receiveOrderReq.getUpValue().trim();
             String upNum = "0";
@@ -172,11 +205,18 @@ public class OrderServiceImpl implements OrderService {
                 receiveOrderReq.setEndValue(endValue);
             }
         }
-        PageHelper.startPage(1, 20);
+        PageHelper.startPage(receiveOrderReq.getPageNum(), receiveOrderReq.getPageSize());
         List<MobileOrder> orders = orderDao.recieveListOrder(receiveOrderReq);
-        if (receiveOrderReq.getOrderNum() == null) {
-            return ReturnInfo.createReturnSucces(orders);
-        }
-        return ReturnInfo.createReturnSucces(orders);
+        return orders;
+    }
+
+    void insertRecord(String content, Integer orderId) {
+        Record record = new Record();
+        record.setJobNum(AuthCurrentUser.get().getUserInfo().getJobNumber());
+        record.setUserName(AuthCurrentUser.get().getUserInfo().getUserName());
+        record.setMobileJobNum(AuthCurrentUser.getMobileJobNum());
+        record.setContent(content);
+        record.setOrderId(orderId);
+        recordDao.insertSelective(record);
     }
 }

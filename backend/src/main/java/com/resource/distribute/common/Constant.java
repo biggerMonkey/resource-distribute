@@ -7,6 +7,7 @@ package com.resource.distribute.common;
 public interface Constant {
     interface USER {
         int ADMIN = 1;
+        int NOT_ADMIN = 2;
         int IS_DELETE = 1;
         int IS_NOT_DELETE = 2;
         int IS_ENABLE = 2;
@@ -19,5 +20,14 @@ public interface Constant {
     }
     interface ORDER {
         String DEFAULT_SISUATION = "待拨打";
+    }
+    interface TIME {
+        int SECOND = 1;
+        int MINUTE = SECOND * 60;
+        int HALF_HOUR = MINUTE * 30;
+        int HOUR = MINUTE * 60;
+        int DAY = HOUR * 24;
+        int oneMinuteMillisecond = 1000 * 30;
+        int oneHourMillisecond = 1000 * 3600 * 1;// 一小时的毫秒数
     }
 }

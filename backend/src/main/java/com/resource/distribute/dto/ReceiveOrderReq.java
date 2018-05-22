@@ -1,5 +1,7 @@
 package com.resource.distribute.dto;
 
+import com.resource.distribute.common.Constant;
+
 /**
  * @author huangwenjun
  * @version 2018年5月21日 下午11:02:09
@@ -14,6 +16,8 @@ public class ReceiveOrderReq {
     private Integer broadband;// 1->是 2->否
     private String mobileNumber;
     private Integer orderNum;
+    private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
+    private int pageNum = Constant.PAGE.DEFAULT_PAGE_NUM;
 
     public Integer getAreaId() {
         return areaId;
@@ -87,11 +91,28 @@ public class ReceiveOrderReq {
         this.orderNum = orderNum;
     }
 
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public int getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(int pageNum) {
+        this.pageNum = pageNum;
+    }
+
     @Override
     public String toString() {
         return "ReceiveOrderReq [areaId=" + areaId + ", mainMeal=" + mainMeal + ", secondMeal="
-                + secondMeal + ", upValue=" + upValue + ", startValue=" + startValue
-                + ", endValue=" + endValue + ", broadband=" + broadband + ", mobileNumber="
-                + mobileNumber + ", orderNum=" + orderNum + "]";
+                + secondMeal + ", upValue=" + upValue + ", startValue=" + startValue + ", endValue="
+                + endValue + ", broadband=" + broadband + ", mobileNumber=" + mobileNumber
+                + ", orderNum=" + orderNum + ", pageSize=" + pageSize + ", pageNum=" + pageNum
+                + "]";
     }
 }
