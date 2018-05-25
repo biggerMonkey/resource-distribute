@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import tk.mybatis.mapper.entity.Example;
+
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
@@ -23,8 +25,6 @@ import com.resource.distribute.entity.User;
 import com.resource.distribute.service.UserService;
 import com.resource.distribute.utils.AuthCurrentUser;
 import com.resource.distribute.utils.MD5Util;
-
-import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -44,7 +44,6 @@ public class UserServiceImpl implements UserService {
         DB.maxUserJobNumber = String.valueOf(Integer.valueOf(DB.maxUserJobNumber) + 1);
         user.setJobNumber(DB.maxUserJobNumber);
         user.setPassword(MD5Util.getMD5Str(user.getPassword()));
-        user.setIsDelete(null);
         user.setIsEnable(null);
         user.setRoleType(null);
         user.setCreateBy(AuthCurrentUser.getUserId());
@@ -57,6 +56,7 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isEmpty(user.getPassword())) {
             user.setPassword(MD5Util.getMD5Str(user.getPassword()));
         }
+        user.setJobNumber(null);
         user.setRoleType(null);
         user.setUpdateBy(AuthCurrentUser.getUserId());
         userDao.updateByPrimaryKeySelective(user);

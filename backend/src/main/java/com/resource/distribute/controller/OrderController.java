@@ -28,7 +28,7 @@ public class OrderController {
     private OrderService orderService;
 
     @RequestMapping("/import/{area-id}")
-    public ReturnInfo importOrder(@RequestParam("orderfile") MultipartFile orderfile,
+    public ReturnInfo importOrder(@RequestParam("file") MultipartFile orderfile,
             @PathVariable("area-id") Integer areaId) throws Exception {
         if (orderfile == null || areaId == null) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
