@@ -28,12 +28,12 @@ public class OrderController {
     private OrderService orderService;
 
     @RequestMapping("/import/{area-id}")
-    public ReturnInfo importOrder(@RequestParam("file") MultipartFile orderfile,
+    public ReturnInfo importOrder(@RequestParam("orderFile") MultipartFile orderFile,
             @PathVariable("area-id") Integer areaId) throws Exception {
-        if (orderfile == null || areaId == null) {
+        if (orderFile == null || areaId == null) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
         }
-        return orderService.importOrder(orderfile, areaId);
+        return orderService.importOrder(orderFile, areaId);
     }
 
     @PostMapping("/update")
