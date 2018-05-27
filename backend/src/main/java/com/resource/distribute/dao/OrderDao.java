@@ -46,7 +46,7 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
             + "<if test='receiveOrderReq.broadband == 2'>" + "   AND broadband ='' </if>"
             + "<if test='receiveOrderReq.mobileNumber != null'>"
             + "   AND mobile_number like concat(concat('%',#{receiveOrderReq.mobileNumber}),'%') </if> "
-            + " AND job_number='' </where>  ORDER BY create_time</script>")
+            + " AND job_number='' AND is_sensitive=1 </where>  ORDER BY create_time</script>")
     public List<MobileOrder> recieveListOrder(
             @Param("receiveOrderReq") ReceiveOrderReq receiveOrderReq);
 }

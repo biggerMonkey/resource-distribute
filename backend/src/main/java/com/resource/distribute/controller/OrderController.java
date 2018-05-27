@@ -27,13 +27,14 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @RequestMapping("/import/{area-id}")
+    @RequestMapping("/import/{area-id}/{order-type}")
     public ReturnInfo importOrder(@RequestParam("orderFile") MultipartFile orderFile,
-            @PathVariable("area-id") Integer areaId) throws Exception {
-        if (orderFile == null || areaId == null) {
+            @PathVariable("area-id") Integer areaId, @PathVariable("order-type") Integer orderType)
+                    throws Exception {
+        if (orderFile == null || areaId == null || orderType == null) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
         }
-        return orderService.importOrder(orderFile, areaId);
+        return orderService.importOrder(orderFile, areaId, orderType);
     }
 
     @PostMapping("/update")

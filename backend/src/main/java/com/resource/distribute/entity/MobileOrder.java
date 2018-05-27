@@ -21,6 +21,7 @@ public class MobileOrder {
     private String state;// 状态
     private String handSituation;// 办理情况
     private String remarks;// 备注
+    private Integer isSensitive;// 是否为敏感 1->普通 2->敏感
     private String jobNumber;// 工号
     private String userName;// 姓名
     private String mobileJobNumber;// 移动工号
@@ -117,6 +118,14 @@ public class MobileOrder {
         this.remarks = remarks;
     }
 
+    public Integer getIsSensitive() {
+        return isSensitive;
+    }
+
+    public void setIsSensitive(Integer isSensitive) {
+        this.isSensitive = isSensitive;
+    }
+
     public String getJobNumber() {
         return jobNumber;
     }
@@ -178,10 +187,10 @@ public class MobileOrder {
         return "MobileOrder [id=" + id + ", areaId=" + areaId + ", mobileNumber=" + mobileNumber
                 + ", mainMeal=" + mainMeal + ", secondMeal=" + secondMeal + ", upValue=" + upValue
                 + ", overFlow=" + overFlow + ", broadband=" + broadband + ", state=" + state
-                + ", handSituation=" + handSituation + ", remarks=" + remarks + ", jobNumber="
-                + jobNumber + ", userName=" + userName + ", mobileJobNumber=" + mobileJobNumber
-                + ", createBy=" + createBy + ", updateBy=" + updateBy + ", createTime=" + createTime
-                + ", updateTime=" + updateTime + "]";
+                + ", handSituation=" + handSituation + ", remarks=" + remarks + ", isSensitive="
+                + isSensitive + ", jobNumber=" + jobNumber + ", userName=" + userName
+                + ", mobileJobNumber=" + mobileJobNumber + ", createBy=" + createBy + ", updateBy="
+                + updateBy + ", createTime=" + createTime + ", updateTime=" + updateTime + "]";
     }
 
 }

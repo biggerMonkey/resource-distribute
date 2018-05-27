@@ -14,7 +14,8 @@ import com.resource.distribute.dto.ReceiveOrderReq;
 public interface OrderService {
 
 
-    public ReturnInfo importOrder(MultipartFile orderfile, Integer areaId) throws Exception;
+    public ReturnInfo importOrder(MultipartFile orderfile, Integer areaId, Integer orderType)
+            throws Exception;
 
     public ReturnInfo updateOrder(OrderUpdateReq orderReq);
 

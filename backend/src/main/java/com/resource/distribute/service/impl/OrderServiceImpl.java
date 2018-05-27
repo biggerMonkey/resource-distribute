@@ -14,6 +14,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,15 +26,19 @@ import com.resource.distribute.common.ReturnInfo;
 import com.resource.distribute.dao.AreaDao;
 import com.resource.distribute.dao.OrderDao;
 import com.resource.distribute.dao.RecordDao;
+import com.resource.distribute.dao.SysConfigDao;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
 import com.resource.distribute.entity.Area;
 import com.resource.distribute.entity.MobileOrder;
 import com.resource.distribute.entity.Record;
+import com.resource.distribute.entity.SysConfig;
 import com.resource.distribute.entity.User;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
+
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -50,13 +56,36 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private RecordDao recordDao;
 
+    @Autowired
+    private SysConfigDao sysConfigDao;
+
     @Override
-    public ReturnInfo updateOrder(OrderUpdateReq orderReq) {
+    @Transactional
+    public synchronized ReturnInfo updateOrder(OrderUpdateReq orderReq) {
         MobileOrder order = new MobileOrder();
         BeanUtils.copyProperties(orderReq, order);
         order.setUpdateBy(AuthCurrentUser.getUserId());
         orderDao.updateByPrimaryKeySelective(order);
+
+        Example orderExample = new Example(MobileOrder.class);
+        orderExample.createCriteria().andEqualTo("handSituation", Constant.ORDER.NOT_ACCORD);
+        List<MobileOrder> orders = orderDao.selectByExample(orderExample);
         insertRecord("更新", orderReq.getId());
+        if (orders == null || orders.size() == 0) {
+            return ReturnInfo.createReturnSuccessOne(null);
+        }
+        Example configExample = new Example(SysConfig.class);
+        configExample.createCriteria().andEqualTo("sysKey", Constant.ORDER.MAIN_CHANGE_NUM_KEY);
+        List<SysConfig> configs = sysConfigDao.selectByExample(configExample);
+        if (configs == null || configs.size() != 1) {
+            return ReturnInfo.createReturnSuccessOne(CodeEnum.DATA_INVALID);
+        }
+        if (Integer.valueOf(configs.get(0).getSysValue()).equals(orders.size())) {
+            for (MobileOrder tempOrder : orders) {
+                tempOrder.setMainMeal(tempOrder.getRemarks());
+                orderDao.updateByPrimaryKeySelective(tempOrder);
+            }
+        }
         return ReturnInfo.createReturnSuccessOne(null);
     }
 
@@ -73,7 +102,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ReturnInfo importOrder(MultipartFile orderfile, Integer areaId) throws Exception {
+    public ReturnInfo importOrder(MultipartFile orderfile, Integer areaId, Integer orderType)
+            throws Exception {
         Area area = areaDao.selectByPrimaryKey(areaId);
         if (area == null) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
@@ -105,6 +135,7 @@ public class OrderServiceImpl implements OrderService {
             order.setAreaId(areaId);
             order.setState("");
             order.setHandSituation(Constant.ORDER.DEFAULT_SISUATION);
+            order.setIsSensitive(orderType);
             order.setJobNumber("");
             order.setUserName("");
             order.setCreateBy(AuthCurrentUser.getUserId());
@@ -155,8 +186,17 @@ public class OrderServiceImpl implements OrderService {
             }
             orders.add(order);
         }
-        int result = orderDao.insertList(orders);
-        return ReturnInfo.createReturnSuccessOne(result);
+        Example example = new Example(MobileOrder.class);
+        for (MobileOrder order : orders) {
+            example.createCriteria().andEqualTo("mobileNumber", order.getMobileNumber());
+            List<MobileOrder> oldOrders = orderDao.selectByExample(example);
+            if (CollectionUtils.isEmpty(oldOrders)) {
+                orderDao.insertSelective(order);
+            } else {
+                orderDao.updateByExample(order, oldOrders);
+            }
+        }
+        return ReturnInfo.createReturnSuccessOne(null);
     }
 
     @Override

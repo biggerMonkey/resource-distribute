@@ -20,6 +20,10 @@ public interface Constant {
     }
     interface ORDER {
         String DEFAULT_SISUATION = "待拨打";
+        String NOT_ACCORD = "不符合";
+        Integer SENSITIVE = 2;
+        Integer NOT_SENSITIVE = 1;
+        String MAIN_CHANGE_NUM_KEY = "notAccordCount";// 主套餐变为备注次数
     }
     interface TIME {
         int SECOND = 1;
