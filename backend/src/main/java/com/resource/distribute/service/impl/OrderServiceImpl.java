@@ -93,10 +93,18 @@ public class OrderServiceImpl implements OrderService {
     public ReturnInfo listOrder(OrderQueryReq queryReq) {
         PageHelper.startPage(queryReq.getPageNum(), queryReq.getPageSize());
         List<MobileOrder> orders = new ArrayList<MobileOrder>();
-        if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
-            orders = orderDao.listOrder(queryReq, null);
+        String hadDial = "待拨打";
+        if ("已拨打".equals(queryReq.getHandSituation())) {
+            queryReq.setHandSituation(null);
         } else {
-            orders = orderDao.listOrder(queryReq, Constant.USER.NOT_ADMIN);
+            hadDial = null;
+        }
+        if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
+            orders = orderDao.listOrder(queryReq, null, hadDial);
+        } else {
+            orders =
+                    orderDao.listOrder(queryReq,
+                            AuthCurrentUser.get().getUserInfo().getJobNumber(), hadDial);
         }
         return ReturnInfo.createReturnSucces(orders);
     }

@@ -35,7 +35,7 @@ public class AuthCurrentUser {
     }
 
     public static boolean isManager() {
-        if (get().getUserInfo().getRoleType() == Constant.USER.ADMIN) {
+        if (get().getUserInfo().getRoleType() == Integer.valueOf(Constant.USER.ADMIN)) {
             return true;
         } else {
             return false;
