@@ -27,10 +27,10 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @RequestMapping("/import/{area-id}/{order-type}")
+    @RequestMapping(path = "/import/{area-id}/{order-type}")
     public ReturnInfo importOrder(@RequestParam("orderFile") MultipartFile orderFile,
             @PathVariable("area-id") Integer areaId, @PathVariable("order-type") Integer orderType)
-                    throws Exception {
+            throws Exception {
         if (orderFile == null || areaId == null || orderType == null) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
         }

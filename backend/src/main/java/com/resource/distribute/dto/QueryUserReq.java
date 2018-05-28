@@ -10,7 +10,7 @@ public class QueryUserReq {
     private String jobNumber = "";
     private String userName = "";
     private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
-    private int pageNum = Constant.PAGE.DEFAULT_PAGE_NUM;
+    private int pageNo = Constant.PAGE.DEFAULT_PAGE_NUM;
 
     public String getJobNumber() {
         return jobNumber;
@@ -36,17 +36,12 @@ public class QueryUserReq {
         this.pageSize = pageSize;
     }
 
-    public int getPageNum() {
-        return pageNum;
+    public int getPageNo() {
+        return pageNo;
     }
 
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
     }
 
-    @Override
-    public String toString() {
-        return "QueryUserReq [jobNumber=" + jobNumber + ", userName=" + userName + ", pageSize="
-                + pageSize + ", pageNum=" + pageNum + "]";
-    }
 }

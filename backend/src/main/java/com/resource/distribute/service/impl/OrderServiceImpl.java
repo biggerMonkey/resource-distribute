@@ -19,6 +19,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import tk.mybatis.mapper.entity.Example;
+
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
@@ -37,8 +39,6 @@ import com.resource.distribute.entity.SysConfig;
 import com.resource.distribute.entity.User;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
-
-import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -91,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ReturnInfo listOrder(OrderQueryReq queryReq) {
-        PageHelper.startPage(queryReq.getPageNum(), queryReq.getPageSize());
+        PageHelper.startPage(queryReq.getPageNo(), queryReq.getPageSize());
         List<MobileOrder> orders = new ArrayList<MobileOrder>();
         String hadDial = "待拨打";
         if ("已拨打".equals(queryReq.getHandSituation())) {
@@ -215,7 +215,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
-        receiveOrderReq.setPageSize(receiveOrderReq.getOrderNum());
+        receiveOrderReq.setPageNo(receiveOrderReq.getOrderNum());
         List<MobileOrder> orders = searchOrder(receiveOrderReq);
         User user = AuthCurrentUser.get().getUserInfo();
         for (MobileOrder order : orders) {
@@ -253,7 +253,7 @@ public class OrderServiceImpl implements OrderService {
                 receiveOrderReq.setEndValue(endValue);
             }
         }
-        PageHelper.startPage(receiveOrderReq.getPageNum(), receiveOrderReq.getPageSize());
+        PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
         List<MobileOrder> orders = orderDao.recieveListOrder(receiveOrderReq);
         return orders;
     }

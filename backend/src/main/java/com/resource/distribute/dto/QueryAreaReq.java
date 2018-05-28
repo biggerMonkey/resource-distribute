@@ -9,7 +9,7 @@ import com.resource.distribute.common.Constant;
 public class QueryAreaReq {
     private String areaName = "";
     private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
-    private int pageNum = Constant.PAGE.DEFAULT_PAGE_NUM;
+    private int pageNo = Constant.PAGE.DEFAULT_PAGE_NUM;
 
     public String getAreaName() {
         return areaName;
@@ -19,6 +19,14 @@ public class QueryAreaReq {
         this.areaName = areaName;
     }
 
+    public int getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
+    }
+
     public int getPageSize() {
         return pageSize;
     }
@@ -26,13 +34,4 @@ public class QueryAreaReq {
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
-
-    public int getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
-    }
-
 }

@@ -47,7 +47,7 @@ public class AreaServiceImpl implements AreaService {
 
     @Override
     public ReturnInfo listArea(QueryAreaReq queryAreaReq) {
-        PageHelper.startPage(queryAreaReq.getPageNum(), queryAreaReq.getPageSize());
+        PageHelper.startPage(queryAreaReq.getPageNo(), queryAreaReq.getPageSize());
         Example example = new Example(Area.class);
         example.createCriteria().andLike("areaName", "%" + queryAreaReq.getAreaName() + "%");
         List<Area> areas = areaDao.selectByExample(example);

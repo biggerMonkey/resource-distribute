@@ -47,7 +47,7 @@ public class MobileJobNumberServiceImpl implements MobileJobNumberService {
 
     @Override
     public ReturnInfo listMobile(QueryMobileReq queryMobileReq) {
-        PageHelper.startPage(queryMobileReq.getPageNum(), queryMobileReq.getPageSize());
+        PageHelper.startPage(queryMobileReq.getPageNo(), queryMobileReq.getPageSize());
         Example example = new Example(MobileJobNumber.class);
         example.createCriteria().andLike("mobileJobNumber",
                 "%" + queryMobileReq.getMobileJobNumber() + "%");

@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
                 .andLike("userName", "%" + queryUserReq.getUserName() + "%")
                 .andEqualTo("isDelete", Constant.USER.IS_NOT_DELETE);
         example.excludeProperties("password");
-        PageHelper.startPage(queryUserReq.getPageNum(), queryUserReq.getPageSize());
+        PageHelper.startPage(queryUserReq.getPageNo(), queryUserReq.getPageSize());
         List<User> users = userDao.selectByExample(example);
         return ReturnInfo.createReturnSucces(users);
     }

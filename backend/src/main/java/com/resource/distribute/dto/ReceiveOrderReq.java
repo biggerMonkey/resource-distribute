@@ -17,7 +17,7 @@ public class ReceiveOrderReq {
     private String mobileNumber;
     private Integer orderNum;
     private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
-    private int pageNum = Constant.PAGE.DEFAULT_PAGE_NUM;
+    private int pageNo = Constant.PAGE.DEFAULT_PAGE_NUM;
 
     public Integer getAreaId() {
         return areaId;
@@ -91,6 +91,14 @@ public class ReceiveOrderReq {
         this.orderNum = orderNum;
     }
 
+    public int getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
+    }
+
     public int getPageSize() {
         return pageSize;
     }
@@ -99,20 +107,4 @@ public class ReceiveOrderReq {
         this.pageSize = pageSize;
     }
 
-    public int getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    @Override
-    public String toString() {
-        return "ReceiveOrderReq [areaId=" + areaId + ", mainMeal=" + mainMeal + ", secondMeal="
-                + secondMeal + ", upValue=" + upValue + ", startValue=" + startValue + ", endValue="
-                + endValue + ", broadband=" + broadband + ", mobileNumber=" + mobileNumber
-                + ", orderNum=" + orderNum + ", pageSize=" + pageSize + ", pageNum=" + pageNum
-                + "]";
-    }
 }

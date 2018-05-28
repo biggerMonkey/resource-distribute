@@ -12,7 +12,7 @@ public class OrderQueryReq {
     private String startTime;
     private String endTime;
     private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
-    private int pageNum = Constant.PAGE.DEFAULT_PAGE_NUM;
+    private int pageNo = Constant.PAGE.DEFAULT_PAGE_NUM;
 
     public Integer getAreaId() {
         return areaId;
@@ -46,26 +46,20 @@ public class OrderQueryReq {
         this.endTime = endTime;
     }
 
+
+    public int getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
+    }
+
     public int getPageSize() {
         return pageSize;
     }
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
-    }
-
-    public int getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderQueryReq [areaId=" + areaId + ", handSituation=" + handSituation
-                + ", startTime=" + startTime + ", endTime=" + endTime + ", pageSize=" + pageSize
-                + ", pageNum=" + pageNum + "]";
     }
 }

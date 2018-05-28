@@ -9,7 +9,7 @@ import com.resource.distribute.common.Constant;
 public class QueryMobileReq {
     private String mobileJobNumber = "";
     private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
-    private int pageNum = Constant.PAGE.DEFAULT_PAGE_NUM;
+    private int pageNo = Constant.PAGE.DEFAULT_PAGE_NUM;
 
 
     public String getMobileJobNumber() {
@@ -20,20 +20,20 @@ public class QueryMobileReq {
         this.mobileJobNumber = mobileJobNumber;
     }
 
+    public int getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
+    }
+
     public int getPageSize() {
         return pageSize;
     }
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
-    }
-
-    public int getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
     }
 
 }
