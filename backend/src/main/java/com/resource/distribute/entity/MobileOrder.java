@@ -15,8 +15,6 @@ public class MobileOrder {
     private String mobileNumber;// 手机号
     private String mainMeal;// 主套餐
     private String secondMeal;// 副套餐
-    private String upValue;// up值
-    private String overFlow;// 溢出流程(M)
     private String broadband;// 宽带情况
     private String state;// 状态
     private String handSituation;// 办理情况
@@ -25,6 +23,7 @@ public class MobileOrder {
     private String jobNumber;// 工号
     private String userName;// 姓名
     private String mobileJobNumber;// 移动工号
+    private Date receiveTime;// 接收时间
     private Integer createBy;
     private Integer updateBy;// 更新人
     private Date createTime;
@@ -68,22 +67,6 @@ public class MobileOrder {
 
     public void setSecondMeal(String secondMeal) {
         this.secondMeal = secondMeal;
-    }
-
-    public String getUpValue() {
-        return upValue;
-    }
-
-    public void setUpValue(String upValue) {
-        this.upValue = upValue;
-    }
-
-    public String getOverFlow() {
-        return overFlow;
-    }
-
-    public void setOverFlow(String overFlow) {
-        this.overFlow = overFlow;
     }
 
     public String getBroadband() {
@@ -182,15 +165,11 @@ public class MobileOrder {
         this.updateTime = updateTime;
     }
 
-    @Override
-    public String toString() {
-        return "MobileOrder [id=" + id + ", areaId=" + areaId + ", mobileNumber=" + mobileNumber
-                + ", mainMeal=" + mainMeal + ", secondMeal=" + secondMeal + ", upValue=" + upValue
-                + ", overFlow=" + overFlow + ", broadband=" + broadband + ", state=" + state
-                + ", handSituation=" + handSituation + ", remarks=" + remarks + ", isSensitive="
-                + isSensitive + ", jobNumber=" + jobNumber + ", userName=" + userName
-                + ", mobileJobNumber=" + mobileJobNumber + ", createBy=" + createBy + ", updateBy="
-                + updateBy + ", createTime=" + createTime + ", updateTime=" + updateTime + "]";
+    public Date getReceiveTime() {
+        return receiveTime;
     }
 
+    public void setReceiveTime(Date receiveTime) {
+        this.receiveTime = receiveTime;
+    }
 }

@@ -1,5 +1,7 @@
 package com.resource.distribute.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,4 +32,15 @@ public class SysConfigServiceImpl implements SysConfigService {
         return ReturnInfo.createReturnSuccessOne(null);
     }
 
+    @Override
+    public ReturnInfo getList() {
+        List<SysConfig> configs = sysConfigDao.selectAll();
+        return ReturnInfo.createReturnSuccessOne(configs);
+    }
+
+    @Override
+    public ReturnInfo getListById(Integer id) {
+        SysConfig config = sysConfigDao.selectByPrimaryKey(id);
+        return ReturnInfo.createReturnSuccessOne(config);
+    }
 }

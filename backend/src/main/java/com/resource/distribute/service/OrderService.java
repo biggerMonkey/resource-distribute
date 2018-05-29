@@ -24,4 +24,8 @@ public interface OrderService {
     public ReturnInfo receiveOrderSearch(ReceiveOrderReq receiveOrderReq);
 
     public ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq);
+
+    public ReturnInfo mainMeal();
+
+    public ReturnInfo secondMeal();
 }

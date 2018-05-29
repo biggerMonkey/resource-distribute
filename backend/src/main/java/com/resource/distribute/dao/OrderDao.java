@@ -41,10 +41,6 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
             + "   AND main_meal=#{receiveOrderReq.mainMeal} </if>"
             + "<if test='receiveOrderReq.secondMeal != null'>"
             + "   AND second_meal=#{receiveOrderReq.secondMeal} </if>"
-            + "<if test='receiveOrderReq.startValue != null'>"
-            + "   AND up_value  &gt;= #{receiveOrderReq.startValue} </if>"
-            + "<if test='receiveOrderReq.endValue != null'>"
-            + " AND up_value &lt; #{receiveOrderReq.endValue} </if>"
             + "<if test='receiveOrderReq.broadband == 1'>"
             + "   AND broadband !='' </if>"
             + "<if test='receiveOrderReq.broadband == 2'>"
@@ -54,5 +50,11 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
             + " AND job_number='' AND is_sensitive=1 AND hand_situation='待拨打' </where>  ORDER BY create_time</script>")
     public List<MobileOrder> recieveListOrder(
             @Param("receiveOrderReq") ReceiveOrderReq receiveOrderReq);
+
+    @Select("SELECT DISTINCT main_meal FROM mobile_order")
+    public List<String> getListMainMeal();
+
+    @Select("SELECT DISTINCT second_meal FROM mobile_order")
+    public List<String> getListSecondMeal();
 
 }

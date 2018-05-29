@@ -15,6 +15,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import tk.mybatis.mapper.entity.Example;
+
 import com.alibaba.fastjson.JSON;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
@@ -25,8 +27,6 @@ import com.resource.distribute.dto.LoginRes;
 import com.resource.distribute.entity.MobileJobNumber;
 import com.resource.distribute.utils.AuthCurrentUser;
 import com.resource.distribute.utils.SpringContextUtil;
-
-import tk.mybatis.mapper.entity.Example;
 
 public class LoginHandleInterceptor extends HandlerInterceptorAdapter {
 
@@ -46,17 +46,23 @@ public class LoginHandleInterceptor extends HandlerInterceptorAdapter {
             response(response, CodeEnum.NO_LOGIN, null);
             return false;
         }
-        String mobileJonNumber = loginRes.getMobileJobNum();
-        MobileJobNumberDao mobileDao =
-                (MobileJobNumberDao) SpringContextUtil.getBean(MobileJobNumberDao.class);
-        Example example = new Example(MobileJobNumber.class);
-        example.createCriteria().andEqualTo("mobileJobNumber", mobileJonNumber);
-        List<MobileJobNumber> mobileJobNumbers = mobileDao.selectByExample(example);
-        if (mobileJobNumbers == null || mobileJobNumbers.size() != 1) {
-            response(response, CodeEnum.MOBILE_JOB_NUM_ERROR, null);
-            return false;
+        if (!loginRes.getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
+            String mobileJonNumber = loginRes.getMobileJobNum();
+            if (StringUtils.isEmpty(mobileJonNumber)) {
+                response(response, CodeEnum.NO_LOGIN, null);
+                return false;
+            }
+            MobileJobNumberDao mobileDao =
+                    (MobileJobNumberDao) SpringContextUtil.getBean(MobileJobNumberDao.class);
+            Example example = new Example(MobileJobNumber.class);
+            example.createCriteria().andEqualTo("mobileJobNumber", mobileJonNumber);
+            List<MobileJobNumber> mobileJobNumbers = mobileDao.selectByExample(example);
+            if (mobileJobNumbers == null || mobileJobNumbers.size() != 1) {
+                response(response, CodeEnum.MOBILE_JOB_NUM_ERROR, null);
+                return false;
+            }
+            loginRes.setMobileJobNum(mobileJonNumber);
         }
-        loginRes.setMobileJobNum(mobileJonNumber);
         Calendar cal = Calendar.getInstance();
         cal.setTime(loginRes.getLoginTime());
         long oldTime = cal.getTimeInMillis();
@@ -76,8 +82,8 @@ public class LoginHandleInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-            ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response,
+            Object handler, ModelAndView modelAndView) throws Exception {
         // AuthCurrentUser.remove();
     }
 
@@ -86,8 +92,8 @@ public class LoginHandleInterceptor extends HandlerInterceptorAdapter {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setHeader("Content-Type", "application/json");
         PrintWriter out = response.getWriter();
-        out.write(JSON.toJSONString(
-                ReturnInfo.create(codeEnum.getCode(), codeEnum.getMsg(), data, null)));
+        out.write(JSON.toJSONString(ReturnInfo.create(codeEnum.getCode(), codeEnum.getMsg(), data,
+                null)));
         out.flush();
     }
 

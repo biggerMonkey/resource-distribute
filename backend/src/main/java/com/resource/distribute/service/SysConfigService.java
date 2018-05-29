@@ -10,4 +10,8 @@ import com.resource.distribute.dto.SysConfigReq;
 public interface SysConfigService {
     public ReturnInfo updateConfig(SysConfigReq configReq);
 
+    public ReturnInfo getList();
+
+    public ReturnInfo getListById(Integer id);
+
 }

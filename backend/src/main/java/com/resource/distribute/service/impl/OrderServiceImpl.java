@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import tk.mybatis.mapper.entity.Example;
@@ -65,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
         MobileOrder order = new MobileOrder();
         BeanUtils.copyProperties(orderReq, order);
         order.setUpdateBy(AuthCurrentUser.getUserId());
+        order.setReceiveTime(new Date());
         orderDao.updateByPrimaryKeySelective(order);
 
         Example orderExample = new Example(MobileOrder.class);
@@ -82,7 +82,13 @@ public class OrderServiceImpl implements OrderService {
         }
         if (Integer.valueOf(configs.get(0).getSysValue()).equals(orders.size())) {
             for (MobileOrder tempOrder : orders) {
-                tempOrder.setMainMeal(tempOrder.getRemarks());
+                String[] temp = tempOrder.getRemarks().split("&");
+                if (temp.length >= 2) {
+                    tempOrder.setMainMeal(temp[0]);
+                    tempOrder.setSecondMeal(temp[1]);
+                } else {
+                    continue;
+                }
                 orderDao.updateByPrimaryKeySelective(tempOrder);
             }
         }
@@ -173,18 +179,10 @@ public class OrderServiceImpl implements OrderService {
                         break;
                     }
                     case 3: {
-                        order.setUpValue(value);
-                        break;
-                    }
-                    case 4: {
-                        order.setOverFlow(value);
-                        break;
-                    }
-                    case 5: {
                         order.setBroadband(value);
                         break;
                     }
-                    case 6: {
+                    case 4: {
                         order.setRemarks(value);
                         break;
                     }
@@ -229,30 +227,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private List<MobileOrder> searchOrder(ReceiveOrderReq receiveOrderReq) {
-        if (!StringUtils.isEmpty(receiveOrderReq.getUpValue())) {
-            String upValue = receiveOrderReq.getUpValue().trim();
-            String upNum = "0";
-            int flag = 0;
-            for (int i = 0; i < upValue.length(); i++) {
-                if (upValue.charAt(i) >= 48 && upValue.charAt(i) <= 57) {
-                    upNum += upValue.charAt(i);
-                } else {
-                    flag = i;
-                    break;
-                }
-            }
-            Integer startValue = Integer.valueOf(upNum);
-            if (upValue.indexOf("上") != -1) {
-                receiveOrderReq.setStartValue(startValue);
-            } else if (upValue.indexOf("下") != -1) {
-                receiveOrderReq.setEndValue(startValue);
-            } else {
-                int endValue =
-                        Integer.valueOf(upValue.split(String.valueOf(upValue.charAt(flag)))[1]);
-                receiveOrderReq.setStartValue(startValue);
-                receiveOrderReq.setEndValue(endValue);
-            }
-        }
+        // if (!StringUtils.isEmpty(receiveOrderReq.getUpValue())) {
+        // String upValue = receiveOrderReq.getUpValue().trim();
+        // String upNum = "0";
+        // int flag = 0;
+        // for (int i = 0; i < upValue.length(); i++) {
+        // if (upValue.charAt(i) >= 48 && upValue.charAt(i) <= 57) {
+        // upNum += upValue.charAt(i);
+        // } else {
+        // flag = i;
+        // break;
+        // }
+        // }
+        // Integer startValue = Integer.valueOf(upNum);
+        // if (upValue.indexOf("上") != -1) {
+        // receiveOrderReq.setStartValue(startValue);
+        // } else if (upValue.indexOf("下") != -1) {
+        // receiveOrderReq.setEndValue(startValue);
+        // } else {
+        // int endValue =
+        // Integer.valueOf(upValue.split(String.valueOf(upValue.charAt(flag)))[1]);
+        // receiveOrderReq.setStartValue(startValue);
+        // receiveOrderReq.setEndValue(endValue);
+        // }
+        // }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
         List<MobileOrder> orders = orderDao.recieveListOrder(receiveOrderReq);
         return orders;
@@ -266,5 +264,17 @@ public class OrderServiceImpl implements OrderService {
         record.setContent(content);
         record.setOrderId(orderId);
         recordDao.insertSelective(record);
+    }
+
+    @Override
+    public ReturnInfo mainMeal() {
+        List<String> mainMeals = orderDao.getListMainMeal();
+        return ReturnInfo.createReturnSuccessOne(mainMeals);
+    }
+
+    @Override
+    public ReturnInfo secondMeal() {
+        List<String> secondMeals = orderDao.getListSecondMeal();
+        return ReturnInfo.createReturnSuccessOne(secondMeals);
     }
 }

@@ -1,6 +1,7 @@
 package com.resource.distribute.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,5 +56,15 @@ public class OrderController {
     @PostMapping("/receive")
     public ReturnInfo receiveOrder(@RequestBody ReceiveOrderReq receiveOrderReq) {
         return orderService.receiveOrder(receiveOrderReq);
+    }
+
+    @GetMapping("/main/meal")
+    public ReturnInfo mainMeal() {
+        return orderService.mainMeal();
+    }
+
+    @GetMapping("/second/meal")
+    public ReturnInfo secondMeal() {
+        return orderService.secondMeal();
     }
 }

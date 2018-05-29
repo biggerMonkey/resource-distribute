@@ -128,6 +128,6 @@ public class UserServiceImpl implements UserService {
         }
         loginRes.setMobileJobNum(mobileJonNumber);
         DB.users.put(token, loginRes);
-        return ReturnInfo.createReturnSuccessOne(null);
+        return ReturnInfo.createReturnSuccessOne(loginRes);
     }
 }

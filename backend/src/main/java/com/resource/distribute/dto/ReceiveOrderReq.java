@@ -10,7 +10,6 @@ public class ReceiveOrderReq {
     private Integer areaId;
     private String mainMeal;
     private String secondMeal;
-    private String upValue;
     private Integer startValue;
     private Integer endValue;
     private Integer broadband;// 1->是 2->否
@@ -41,14 +40,6 @@ public class ReceiveOrderReq {
 
     public void setSecondMeal(String secondMeal) {
         this.secondMeal = secondMeal;
-    }
-
-    public String getUpValue() {
-        return upValue;
-    }
-
-    public void setUpValue(String upValue) {
-        this.upValue = upValue;
     }
 
     public Integer getStartValue() {
