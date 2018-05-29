@@ -11,14 +11,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import tk.mybatis.mapper.entity.Example;
 
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
@@ -28,6 +25,7 @@ import com.resource.distribute.dao.AreaDao;
 import com.resource.distribute.dao.OrderDao;
 import com.resource.distribute.dao.RecordDao;
 import com.resource.distribute.dao.SysConfigDao;
+import com.resource.distribute.dao.UserOrderDao;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
@@ -36,8 +34,11 @@ import com.resource.distribute.entity.MobileOrder;
 import com.resource.distribute.entity.Record;
 import com.resource.distribute.entity.SysConfig;
 import com.resource.distribute.entity.User;
+import com.resource.distribute.entity.UserOrder;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
+
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -58,20 +59,28 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SysConfigDao sysConfigDao;
 
+    @Autowired
+    private UserOrderDao userOrderDao;
+
     @Override
     @Transactional
     public synchronized ReturnInfo updateOrder(OrderUpdateReq orderReq) {
-        MobileOrder order = new MobileOrder();
-        BeanUtils.copyProperties(orderReq, order);
-        order.setUpdateBy(AuthCurrentUser.getUserId());
-        order.setReceiveTime(new Date());
-        orderDao.updateByPrimaryKeySelective(order);
+        UserOrder userOrder = new UserOrder();
+        userOrder.setOrderId(orderReq.getOrderId());
+        userOrder.setUserId(AuthCurrentUser.getUserId());
+        userOrder.setOrderState(orderReq.getState());
+        userOrder.setHandSituation(orderReq.getHandSituation());
+        userOrder.setUpdateBy(AuthCurrentUser.getUserId());
+        Example userOrderExample = new Example(UserOrder.class);
+        userOrderExample.createCriteria().andEqualTo("orderId", orderReq.getOrderId())
+                .andEqualTo("userId", AuthCurrentUser.getUserId());
+        userOrderDao.updateByExample(userOrder, userOrderExample);
+        insertRecord("更新 orderId->", orderReq.getOrderId());
 
-        Example orderExample = new Example(MobileOrder.class);
+        Example orderExample = new Example(UserOrder.class);
         orderExample.createCriteria().andEqualTo("handSituation", Constant.ORDER.NOT_ACCORD);
-        List<MobileOrder> orders = orderDao.selectByExample(orderExample);
-        insertRecord("更新", orderReq.getId());
-        if (orders == null || orders.size() == 0) {
+        List<UserOrder> userOrders = userOrderDao.selectByExample(orderExample);
+        if (userOrders == null || userOrders.size() == 0) {
             return ReturnInfo.createReturnSuccessOne(null);
         }
         Example configExample = new Example(SysConfig.class);
@@ -80,37 +89,41 @@ public class OrderServiceImpl implements OrderService {
         if (configs == null || configs.size() != 1) {
             return ReturnInfo.createReturnSuccessOne(CodeEnum.DATA_INVALID);
         }
-        if (Integer.valueOf(configs.get(0).getSysValue()).equals(orders.size())) {
-            for (MobileOrder tempOrder : orders) {
-                String[] temp = tempOrder.getRemarks().split("&");
-                if (temp.length >= 2) {
-                    tempOrder.setMainMeal(temp[0]);
-                    tempOrder.setSecondMeal(temp[1]);
-                } else {
-                    continue;
-                }
-                orderDao.updateByPrimaryKeySelective(tempOrder);
-            }
-        }
+        // if (Integer.valueOf(configs.get(0).getSysValue()).equals(userOrders.size())) {
+        // TODO
+        // for (UserOrder tempOrder : userOrders) {
+        // String[] temp = tempOrder.getRemarks().split("&");
+        // if (temp.length >= 2) {
+        // tempOrder.setMainMeal(temp[0]);
+        // tempOrder.setSecondMeal(temp[1]);
+        // } else {
+        // continue;
+        // }
+        // orderDao.updateByPrimaryKeySelective(tempOrder);
+        // }
+        // }
         return ReturnInfo.createReturnSuccessOne(null);
+
     }
 
     @Override
     public ReturnInfo listOrder(OrderQueryReq queryReq) {
         PageHelper.startPage(queryReq.getPageNo(), queryReq.getPageSize());
         List<MobileOrder> orders = new ArrayList<MobileOrder>();
-        String hadDial = "待拨打";
-        if ("已拨打".equals(queryReq.getHandSituation())) {
-            queryReq.setHandSituation(null);
+        if (!Constant.ORDER.DEFAULT_SISUATION.equals(queryReq.getHandSituation())) {
+            if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
+                orders = orderDao.listOtherOrder(queryReq, null);
+            } else {
+                orders = orderDao.listOtherOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
+            }
         } else {
-            hadDial = null;
-        }
-        if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
-            orders = orderDao.listOrder(queryReq, null, hadDial);
-        } else {
-            orders =
-                    orderDao.listOrder(queryReq,
-                            AuthCurrentUser.get().getUserInfo().getJobNumber(), hadDial);
+            if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
+                orders = orderDao.listWaitOrder(queryReq, null);
+            } else {
+                orders = orderDao.listWaitOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
+            }
         }
         return ReturnInfo.createReturnSucces(orders);
     }
@@ -147,13 +160,8 @@ public class OrderServiceImpl implements OrderService {
         for (int i = 1; i <= trLength; i++) {
             MobileOrder order = new MobileOrder();
             order.setAreaId(areaId);
-            order.setState("");
-            order.setHandSituation(Constant.ORDER.DEFAULT_SISUATION);
             order.setIsSensitive(orderType);
-            order.setJobNumber("");
-            order.setUserName("");
             order.setCreateBy(AuthCurrentUser.getUserId());
-            order.setMobileJobNumber(AuthCurrentUser.getMobileJobNum());
             order.setCreateTime(new Date());
             // 得到Excel工作表的行
             Row row1 = sheet.getRow(i);
@@ -180,10 +188,6 @@ public class OrderServiceImpl implements OrderService {
                     }
                     case 3: {
                         order.setBroadband(value);
-                        break;
-                    }
-                    case 4: {
-                        order.setRemarks(value);
                         break;
                     }
                     default:
@@ -216,13 +220,20 @@ public class OrderServiceImpl implements OrderService {
         receiveOrderReq.setPageNo(receiveOrderReq.getOrderNum());
         List<MobileOrder> orders = searchOrder(receiveOrderReq);
         User user = AuthCurrentUser.get().getUserInfo();
+        String orderIds = "";
         for (MobileOrder order : orders) {
-            order.setMobileJobNumber(AuthCurrentUser.getMobileJobNum());
-            order.setJobNumber(user.getJobNumber());
-            order.setUserName(user.getUserName());
-            orderDao.updateByPrimaryKeySelective(order);
+            UserOrder userOrder = new UserOrder();
+            userOrder.setUserId(user.getId());
+            userOrder.setOrderId(order.getId());
+            userOrder.setJobNumber(user.getJobNumber());
+            userOrder.setUserName(user.getUserName());
+            userOrder.setMobileJobNumber(AuthCurrentUser.getMobileJobNum());
+            userOrder.setReceiveTime(new Date());
+            userOrder.setHandSituation(Constant.ORDER.DEFAULT_SISUATION);
+            userOrderDao.insertSelective(userOrder);
+            orderIds += order.getId() + " ";
         }
-        insertRecord("领取单子:" + orders.size(), null);
+        insertRecord("领取单子:数量->" + orders.size() + " 单子id->" + orderIds, null);
         return ReturnInfo.createReturnSuccessOne(orders.size());
     }
 
