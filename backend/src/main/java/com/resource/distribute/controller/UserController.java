@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
 import com.resource.distribute.common.ReturnInfo;
@@ -67,6 +68,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ReturnInfo login(@RequestBody LoginReq loginReq) {
+        LOG.info("用户登陆：" + JSON.toJSONString(loginReq));
         return userService.login(loginReq);
     }
 

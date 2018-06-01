@@ -18,8 +18,6 @@ import com.resource.distribute.common.ReturnInfo;
 public class GlobalExceptionHandler {
     private final static Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-
-
     @ExceptionHandler(Exception.class)
     public ReturnInfo exceptionHandler(Exception exception) {
         LOG.error(exception.getMessage(), exception);

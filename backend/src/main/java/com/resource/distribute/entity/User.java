@@ -13,14 +13,16 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class User {
     @Id
     private Integer id;
+    private Integer areaId;
+    private String areaName;
     private String jobNumber;// 工号
     @NotEmpty
     private String userName;// 姓名
     @NotEmpty
     private String password;// 密码
-    private Integer isEnable;
-    private Integer isDelete;
-    private Integer roleType;
+    private Integer isEnable;// 1->禁用 2->启用
+    private Integer isDelete;// 1->删除 2->未删除
+    private Integer roleType;// 1->管理员 2->普通用户
     private Date createTime;
     private Date updateTime;
     private Integer createBy;
@@ -32,6 +34,22 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(Integer areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 
     public String getJobNumber() {
@@ -112,13 +130,5 @@ public class User {
 
     public void setUpdateBy(Integer updateBy) {
         this.updateBy = updateBy;
-    }
-
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", jobNumber=" + jobNumber + ", userName=" + userName
-                + ", password=" + password + ", isDelete=" + isDelete + ", roleType=" + roleType
-                + ", createTime=" + createTime + ", updateTime=" + updateTime + ", createBy="
-                + createBy + ", updateBy=" + updateBy + "]";
     }
 }

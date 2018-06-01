@@ -1,7 +1,6 @@
 package com.resource.distribute.common;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.resource.distribute.dto.LoginRes;
 
@@ -12,5 +11,6 @@ import com.resource.distribute.dto.LoginRes;
  */
 public class DB {
     public static String maxUserJobNumber = "";
-    public static Map<String, LoginRes> users = new HashMap<String, LoginRes>();
+    public static ConcurrentHashMap<String, LoginRes> users =
+            new ConcurrentHashMap<String, LoginRes>();
 }

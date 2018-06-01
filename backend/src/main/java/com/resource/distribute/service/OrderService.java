@@ -3,6 +3,7 @@ package com.resource.distribute.service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.resource.distribute.common.ReturnInfo;
+import com.resource.distribute.dto.CountReq;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
@@ -28,4 +29,6 @@ public interface OrderService {
     public ReturnInfo mainMeal();
 
     public ReturnInfo secondMeal();
+
+    public ReturnInfo orderCount(CountReq countReq);
 }

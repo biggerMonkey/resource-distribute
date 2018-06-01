@@ -8,13 +8,11 @@ import com.resource.distribute.common.Constant;
  */
 public class ReceiveOrderReq {
     private Integer areaId;
-    private String mainMeal;
-    private String secondMeal;
-    private Integer startValue;
-    private Integer endValue;
+    private String mainMeal;// 主套餐
+    private String secondMeal;// 副套餐
     private Integer broadband;// 1->是 2->否
-    private String mobileNumber;
-    private Integer orderNum;
+    private String mobileNumber;// 手机号
+    private Integer orderNum;// 领取单子数量
     private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
     private int pageNo = Constant.PAGE.DEFAULT_PAGE_NUM;
 
@@ -40,22 +38,6 @@ public class ReceiveOrderReq {
 
     public void setSecondMeal(String secondMeal) {
         this.secondMeal = secondMeal;
-    }
-
-    public Integer getStartValue() {
-        return startValue;
-    }
-
-    public void setStartValue(Integer startValue) {
-        this.startValue = startValue;
-    }
-
-    public Integer getEndValue() {
-        return endValue;
-    }
-
-    public void setEndValue(Integer endValue) {
-        this.endValue = endValue;
     }
 
     public Integer getBroadband() {

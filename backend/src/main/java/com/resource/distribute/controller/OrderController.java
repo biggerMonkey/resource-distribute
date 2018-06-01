@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.ReturnInfo;
+import com.resource.distribute.dto.CountReq;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
@@ -28,7 +29,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @RequestMapping(path = "/import/{area-id}/{order-type}")
+    @PostMapping(path = "/import/{area-id}/{order-type}")
     public ReturnInfo importOrder(@RequestParam("orderFile") MultipartFile orderFile,
             @PathVariable("area-id") Integer areaId, @PathVariable("order-type") Integer orderType)
             throws Exception {
@@ -66,5 +67,10 @@ public class OrderController {
     @GetMapping("/second/meal")
     public ReturnInfo secondMeal() {
         return orderService.secondMeal();
+    }
+
+    @RequestMapping("/count")
+    public ReturnInfo countOrder(@RequestBody CountReq countReq) {
+        return orderService.orderCount(countReq);
     }
 }

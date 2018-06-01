@@ -1,0 +1,145 @@
+package com.resource.distribute.entity;
+
+import java.util.Date;
+
+/**
+ * @author huangwenjun
+ * @Date 2018年5月30日
+ */
+public class UserOrderQueryInfo {
+    private Integer areaId;// 关联的区域id
+    private String mobileNumber;// 手机号
+    private String mainMeal;// 主套餐
+    private String secondMeal;// 副套餐
+    private String broadband;// 宽带情况
+    private Integer isSensitive;// 是否为敏感 1->普通 2->敏感
+    private Integer userId;// 用户id
+    private Integer orderId;// 单子id
+    private String orderState;// 状态
+    private String handSituation;// 办理情况
+    private String remarks;// 备注
+    private String jobNumber;// 工号
+    private String userName;// 姓名
+    private String mobileJobNumber;// 移动工号
+    private Date receiveTime;// 接收时间
+
+    public Integer getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(Integer areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
+
+    public String getMainMeal() {
+        return mainMeal;
+    }
+
+    public void setMainMeal(String mainMeal) {
+        this.mainMeal = mainMeal;
+    }
+
+    public String getSecondMeal() {
+        return secondMeal;
+    }
+
+    public void setSecondMeal(String secondMeal) {
+        this.secondMeal = secondMeal;
+    }
+
+    public String getBroadband() {
+        return broadband;
+    }
+
+    public void setBroadband(String broadband) {
+        this.broadband = broadband;
+    }
+
+    public Integer getIsSensitive() {
+        return isSensitive;
+    }
+
+    public void setIsSensitive(Integer isSensitive) {
+        this.isSensitive = isSensitive;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getOrderState() {
+        return orderState;
+    }
+
+    public void setOrderState(String orderState) {
+        this.orderState = orderState;
+    }
+
+    public String getHandSituation() {
+        return handSituation;
+    }
+
+    public void setHandSituation(String handSituation) {
+        this.handSituation = handSituation;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getJobNumber() {
+        return jobNumber;
+    }
+
+    public void setJobNumber(String jobNumber) {
+        this.jobNumber = jobNumber;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getMobileJobNumber() {
+        return mobileJobNumber;
+    }
+
+    public void setMobileJobNumber(String mobileJobNumber) {
+        this.mobileJobNumber = mobileJobNumber;
+    }
+
+    public Date getReceiveTime() {
+        return receiveTime;
+    }
+
+    public void setReceiveTime(Date receiveTime) {
+        this.receiveTime = receiveTime;
+    }
+}

@@ -1,7 +1,10 @@
 package com.resource.distribute.service.impl;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -11,11 +14,17 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
@@ -26,6 +35,8 @@ import com.resource.distribute.dao.OrderDao;
 import com.resource.distribute.dao.RecordDao;
 import com.resource.distribute.dao.SysConfigDao;
 import com.resource.distribute.dao.UserOrderDao;
+import com.resource.distribute.dto.CountReq;
+import com.resource.distribute.dto.CountRes;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
@@ -35,10 +46,9 @@ import com.resource.distribute.entity.Record;
 import com.resource.distribute.entity.SysConfig;
 import com.resource.distribute.entity.User;
 import com.resource.distribute.entity.UserOrder;
+import com.resource.distribute.entity.UserOrderQueryInfo;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
-
-import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -47,6 +57,7 @@ import tk.mybatis.mapper.entity.Example;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private static Logger LOG = LoggerFactory.getLogger(OrderServiceImpl.class);
     @Autowired
     private OrderDao orderDao;
 
@@ -69,60 +80,85 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setOrderId(orderReq.getOrderId());
         userOrder.setUserId(AuthCurrentUser.getUserId());
         userOrder.setOrderState(orderReq.getState());
-        userOrder.setHandSituation(orderReq.getHandSituation());
+        userOrder.setHandSituation(orderReq.getHandSituation().trim());
+        userOrder.setRemarks(orderReq.getRemarks());
         userOrder.setUpdateBy(AuthCurrentUser.getUserId());
+
         Example userOrderExample = new Example(UserOrder.class);
         userOrderExample.createCriteria().andEqualTo("orderId", orderReq.getOrderId())
                 .andEqualTo("userId", AuthCurrentUser.getUserId());
-        userOrderDao.updateByExample(userOrder, userOrderExample);
+        userOrderDao.updateByExampleSelective(userOrder, userOrderExample);
         insertRecord("更新 orderId->", orderReq.getOrderId());
 
         Example orderExample = new Example(UserOrder.class);
-        orderExample.createCriteria().andEqualTo("handSituation", Constant.ORDER.NOT_ACCORD);
+        orderExample.createCriteria().andEqualTo("handSituation", Constant.ORDER.NOT_ACCORD)
+                .andEqualTo("orderId", orderReq.getOrderId());
         List<UserOrder> userOrders = userOrderDao.selectByExample(orderExample);
         if (userOrders == null || userOrders.size() == 0) {
             return ReturnInfo.createReturnSuccessOne(null);
         }
-        Example configExample = new Example(SysConfig.class);
-        configExample.createCriteria().andEqualTo("sysKey", Constant.ORDER.MAIN_CHANGE_NUM_KEY);
-        List<SysConfig> configs = sysConfigDao.selectByExample(configExample);
-        if (configs == null || configs.size() != 1) {
+        SysConfig configs = sysConfigDao.selectByPrimaryKey(Constant.SYS_CONFIG.MAIN_CHANGE_NUM_ID);
+        if (configs == null) {
             return ReturnInfo.createReturnSuccessOne(CodeEnum.DATA_INVALID);
         }
-        // if (Integer.valueOf(configs.get(0).getSysValue()).equals(userOrders.size())) {
-        // TODO
-        // for (UserOrder tempOrder : userOrders) {
-        // String[] temp = tempOrder.getRemarks().split("&");
-        // if (temp.length >= 2) {
-        // tempOrder.setMainMeal(temp[0]);
-        // tempOrder.setSecondMeal(temp[1]);
-        // } else {
-        // continue;
-        // }
-        // orderDao.updateByPrimaryKeySelective(tempOrder);
-        // }
-        // }
+        String[] remarks = new String[userOrders.size()];
+        int[] counts = new int[userOrders.size()];
+        int tempNum = 0;
+        boolean flag = true;
+        if (userOrders.size() >= Integer.valueOf(configs.getSysValue())) {
+            for (UserOrder tempUserOrder : userOrders) {
+                if (tempUserOrder.getHandSituation().equals(Constant.ORDER.NOT_ACCORD)) {
+                    for (int i = 0; i < remarks.length; i++) {
+                        if (tempUserOrder.getRemarks().equals(remarks[i])) {
+                            counts[i]++;
+                            flag = false;
+                        }
+                    }
+                    if (flag) {
+                        remarks[tempNum] = tempUserOrder.getRemarks();
+                        counts[tempNum]++;
+                        tempNum++;
+                        flag = true;
+                    }
+                }
+            }
+            for (int j = 0; j < counts.length; j++) {
+                if (counts[j] >= Integer.valueOf(configs.getSysValue())) {
+                    String[] needChangeRemark = remarks[j].split("&");
+                    if (needChangeRemark.length != 2) {
+                        LOG.info("备注信息有误：" + remarks[j]);
+                        continue;
+                    }
+                    MobileOrder mobileOrder = new MobileOrder();
+                    mobileOrder.setId(orderReq.getOrderId());
+                    mobileOrder.setMainMeal(needChangeRemark[0]);
+                    mobileOrder.setSecondMeal(needChangeRemark[1]);
+                    orderDao.updateByPrimaryKeySelective(mobileOrder);
+                }
+            }
+        }
         return ReturnInfo.createReturnSuccessOne(null);
-
     }
 
     @Override
     public ReturnInfo listOrder(OrderQueryReq queryReq) {
         PageHelper.startPage(queryReq.getPageNo(), queryReq.getPageSize());
-        List<MobileOrder> orders = new ArrayList<MobileOrder>();
+        List<UserOrderQueryInfo> orders = new ArrayList<UserOrderQueryInfo>();
         if (!Constant.ORDER.DEFAULT_SISUATION.equals(queryReq.getHandSituation())) {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listOtherOrder(queryReq, null);
             } else {
-                orders = orderDao.listOtherOrder(queryReq,
-                        AuthCurrentUser.get().getUserInfo().getJobNumber());
+                orders =
+                        orderDao.listOtherOrder(queryReq, AuthCurrentUser.get().getUserInfo()
+                                .getJobNumber());
             }
         } else {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listWaitOrder(queryReq, null);
             } else {
-                orders = orderDao.listWaitOrder(queryReq,
-                        AuthCurrentUser.get().getUserInfo().getJobNumber());
+                orders =
+                        orderDao.listWaitOrder(queryReq, AuthCurrentUser.get().getUserInfo()
+                                .getJobNumber());
             }
         }
         return ReturnInfo.createReturnSucces(orders);
@@ -203,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
             if (CollectionUtils.isEmpty(oldOrders)) {
                 orderDao.insertSelective(order);
             } else {
-                orderDao.updateByExample(order, oldOrders);
+                orderDao.updateByExample(order, example);
             }
         }
         return ReturnInfo.createReturnSuccessOne(null);
@@ -217,7 +253,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
-        receiveOrderReq.setPageNo(receiveOrderReq.getOrderNum());
+        receiveOrderReq.setPageSize(receiveOrderReq.getOrderNum());
         List<MobileOrder> orders = searchOrder(receiveOrderReq);
         User user = AuthCurrentUser.get().getUserInfo();
         String orderIds = "";
@@ -262,8 +298,35 @@ public class OrderServiceImpl implements OrderService {
         // receiveOrderReq.setEndValue(endValue);
         // }
         // }
+        String recieveIntervalTime = "1900-01-01 00:00:00";
+        String notSuccessTime = "1900-01-01 00:00:00";
+        String successTime = "1900-01-01 00:00:00";
+        List<SysConfig> configs = sysConfigDao.selectAll();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        long nowTime = cal.getTimeInMillis();
+        for (SysConfig tempConfig : configs) {
+            long newTime =
+                    nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
+                            * Constant.TIME.oneHourMillisecond;
+            Date date2 = new Date(newTime);
+            switch (tempConfig.getId()) {
+                case Constant.SYS_CONFIG.RECIEVE_TIME_ID:
+                    recieveIntervalTime = simpleDateFormat.format(date2);
+                    break;
+                case Constant.SYS_CONFIG.NOT_SUCCESS_TIME_ID:
+                    notSuccessTime = simpleDateFormat.format(date2);
+                    break;
+                case Constant.SYS_CONFIG.SUCCESS_TIME_ID:
+                    successTime = simpleDateFormat.format(date2);
+                    break;
+            }
+        }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
-        List<MobileOrder> orders = orderDao.recieveListOrder(receiveOrderReq);
+        List<MobileOrder> orders =
+                orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
+                        successTime);
         return orders;
     }
 
@@ -287,5 +350,42 @@ public class OrderServiceImpl implements OrderService {
     public ReturnInfo secondMeal() {
         List<String> secondMeals = orderDao.getListSecondMeal();
         return ReturnInfo.createReturnSuccessOne(secondMeals);
+    }
+
+    @Override
+    public ReturnInfo orderCount(CountReq countReq) {
+        Example example = new Example(UserOrder.class);
+        Criteria criteria = example.createCriteria();
+        if (AuthCurrentUser.isManager()) {
+            criteria.andGreaterThanOrEqualTo("receiveTime", countReq.getStartTime())
+                    .andLessThanOrEqualTo("receiveTime", countReq.getEndTime());
+            if (!StringUtils.isEmpty(countReq.getJobNumber())) {
+                criteria.andEqualTo("jobNumber", countReq.getJobNumber());
+            }
+            if (!StringUtils.isEmpty(countReq.getMobileJobNumber())) {
+                criteria.andEqualTo("mobileJobNumber", countReq.getMobileJobNumber());
+            }
+        } else {
+            criteria.andGreaterThanOrEqualTo("receiveTime", countReq.getStartTime())
+                    .andLessThanOrEqualTo("receiveTime", countReq.getEndTime())
+                    .andEqualTo("userId", AuthCurrentUser.getUserId());
+        }
+        // 领单数
+        int recieveNum = userOrderDao.selectCountByExample(example);
+        criteria.andEqualTo("handSituation", Constant.ORDER.SUCCESS);
+        // 成功数
+        int successNum = userOrderDao.selectCountByExample(example);
+        // 成功率
+        BigDecimal recieve = new BigDecimal(recieveNum);
+        BigDecimal success = new BigDecimal(successNum);
+        BigDecimal successRate = new BigDecimal(0);
+        if (!success.equals(successRate)) {
+            successRate = success.divide(recieve, 4, BigDecimal.ROUND_UP);
+        }
+        CountRes countRes = new CountRes();
+        countRes.setRecieveNum(recieveNum);
+        countRes.setSuccessNum(successNum);
+        countRes.setSuccessRate(successRate.doubleValue());
+        return ReturnInfo.createReturnSuccessOne(countRes);
     }
 }

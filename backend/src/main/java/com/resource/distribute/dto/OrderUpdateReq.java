@@ -8,6 +8,7 @@ public class OrderUpdateReq {
     private Integer orderId;
     private String state;// 状态
     private String handSituation;// 办理情况
+    private String remarks;
 
     public Integer getOrderId() {
         return orderId;
@@ -31,5 +32,13 @@ public class OrderUpdateReq {
 
     public void setHandSituation(String handSituation) {
         this.handSituation = handSituation;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }
