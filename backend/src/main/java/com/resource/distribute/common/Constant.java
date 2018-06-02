@@ -40,4 +40,9 @@ public interface Constant {
         int NOT_SUCCESS_TIME_ID = 3;// 未成功单子间隔时间配置id
         int SUCCESS_TIME_ID = 4;// 成功单子间隔时间配置id
     }
+
+    interface DEPARTMENT{
+        int IS_DELETE = 1;
+        int IS_NOT_DELETE = 2;
+    }
 }

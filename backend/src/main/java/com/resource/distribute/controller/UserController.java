@@ -3,6 +3,7 @@ package com.resource.distribute.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import com.resource.distribute.utils.ValidateLogUtils;
  * @author huangwenjun
  * @Date 2018年5月21日
  */
+@Api(value = "UserController", description = "用户管理")
 @RestController
 @RequestMapping("/resource/user")
 public class UserController {

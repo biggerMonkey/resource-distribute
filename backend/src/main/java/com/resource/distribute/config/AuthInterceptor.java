@@ -13,9 +13,12 @@ import com.resource.distribute.interceptor.LoginHandleInterceptor;
 public class AuthInterceptor extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        String[] swagger = new String[] {"/swagger**", "/v2/api-docs"};
         registry.addInterceptor(new LoginHandleInterceptor()).addPathPatterns("/**")
                 .excludePathPatterns("/resource/user/login")
-                .excludePathPatterns("/resource/user/check/*");
+                .excludePathPatterns("/resource/user/check/*")
+                .excludePathPatterns("/error")
+                .excludePathPatterns(swagger);
         super.addInterceptors(registry);
     }
 }

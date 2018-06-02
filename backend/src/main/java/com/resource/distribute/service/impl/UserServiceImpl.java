@@ -1,20 +1,23 @@
 package com.resource.distribute.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.resource.distribute.common.*;
+import com.resource.distribute.dao.DepartmentDao;
+import com.resource.distribute.dto.UserList;
+import com.resource.distribute.entity.Department;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import tk.mybatis.mapper.entity.Example;
 
 import com.github.pagehelper.PageHelper;
-import com.resource.distribute.common.CodeEnum;
-import com.resource.distribute.common.Constant;
-import com.resource.distribute.common.DB;
-import com.resource.distribute.common.ReturnInfo;
 import com.resource.distribute.dao.MobileJobNumberDao;
 import com.resource.distribute.dao.UserDao;
 import com.resource.distribute.dto.LoginReq;
@@ -38,6 +41,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private MobileJobNumberDao mobileDao;
+
+    @Autowired
+    private DepartmentDao departmentDao;
 
     @Override
     public synchronized ReturnInfo addUser(User user) {
@@ -81,7 +87,30 @@ public class UserServiceImpl implements UserService {
         example.excludeProperties("password");
         PageHelper.startPage(queryUserReq.getPageNo(), queryUserReq.getPageSize());
         List<User> users = userDao.selectByExample(example);
-        return ReturnInfo.createReturnSucces(users);
+        PageNation pageNation = ReturnInfo.create(users);
+        List<Department> departments = null;
+        if (!CollectionUtils.isEmpty(users)){
+
+            List<Integer> depIds = new ArrayList<>();
+            users.forEach(item->depIds.add(item.getDevId()));
+            Example depExamp = new Example(Department.class);
+            depExamp.createCriteria().andIn("id",depIds);
+            departments = departmentDao.selectByExample(depExamp);
+        }
+        List<UserList> userListList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(departments)){
+            for (User user : users) {
+                UserList userList = new UserList();
+                BeanUtils.copyProperties(user,userList);
+                for (Department department : departments) {
+                    if (department.getId().equals(user.getDevId())){
+                        userList.setDepName(department.getDepName());
+                    }
+                }
+                userListList.add(userList);
+            }
+        }
+        return ReturnInfo.create(userListList,pageNation);
     }
 
     @Override

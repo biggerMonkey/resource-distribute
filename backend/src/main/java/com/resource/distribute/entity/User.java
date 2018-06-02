@@ -27,6 +27,8 @@ public class User {
     private Date updateTime;
     private Integer createBy;
     private Integer updateBy;
+    @NotEmpty
+    private Integer devId;
 
     public Integer getId() {
         return id;
@@ -130,5 +132,13 @@ public class User {
 
     public void setUpdateBy(Integer updateBy) {
         this.updateBy = updateBy;
+    }
+
+    public Integer getDevId() {
+        return devId;
+    }
+
+    public void setDevId(Integer devId) {
+        this.devId = devId;
     }
 }
