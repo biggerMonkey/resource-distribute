@@ -15,6 +15,7 @@ public class UserOrder {
     private String remarks;
     private String jobNumber;
     private String userName;
+    private Integer devId;
     private String mobileJobNumber;
     private Date receiveTime;
     private Integer createBy;
@@ -22,11 +23,11 @@ public class UserOrder {
     private Date createTime;
     private Date updateTime;
 
-    private String mainCourse; //主套餐
-    private String pairCourse; //副套餐
-    private String broadband; //宽带
-    private String newlyOpen; //新开
-    private String priceDifference; //价差
+    private String mainCourse; // 主套餐
+    private String pairCourse; // 副套餐
+    private String broadbandInfo; // 宽带
+    private String newlyOpen; // 新开
+    private Integer priceDifference; // 价差
 
     public Integer getId() {
         return id;
@@ -157,12 +158,12 @@ public class UserOrder {
         this.pairCourse = pairCourse;
     }
 
-    public String getBroadband() {
-        return broadband;
+    public String getBroadbandInfo() {
+        return broadbandInfo;
     }
 
-    public void setBroadband(String broadband) {
-        this.broadband = broadband;
+    public void setBroadbandInfo(String broadbandInfo) {
+        this.broadbandInfo = broadbandInfo;
     }
 
     public String getNewlyOpen() {
@@ -173,11 +174,20 @@ public class UserOrder {
         this.newlyOpen = newlyOpen;
     }
 
-    public String getPriceDifference() {
+    public Integer getPriceDifference() {
         return priceDifference;
     }
 
-    public void setPriceDifference(String priceDifference) {
+    public void setPriceDifference(Integer priceDifference) {
         this.priceDifference = priceDifference;
     }
+
+    public Integer getDevId() {
+        return devId;
+    }
+
+    public void setDevId(Integer devId) {
+        this.devId = devId;
+    }
+
 }

@@ -20,11 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import tk.mybatis.mapper.entity.Example;
-import tk.mybatis.mapper.entity.Example.Criteria;
 
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
@@ -40,15 +36,17 @@ import com.resource.distribute.dto.CountRes;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
+import com.resource.distribute.dto.UserOrderQueryInfo;
 import com.resource.distribute.entity.Area;
 import com.resource.distribute.entity.MobileOrder;
 import com.resource.distribute.entity.Record;
 import com.resource.distribute.entity.SysConfig;
 import com.resource.distribute.entity.User;
 import com.resource.distribute.entity.UserOrder;
-import com.resource.distribute.entity.UserOrderQueryInfo;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
+
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -83,6 +81,7 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setHandSituation(orderReq.getHandSituation().trim());
         userOrder.setRemarks(orderReq.getRemarks());
         userOrder.setUpdateBy(AuthCurrentUser.getUserId());
+        userOrder.setDevId(AuthCurrentUser.get().getUserInfo().getDevId());
 
         Example userOrderExample = new Example(UserOrder.class);
         userOrderExample.createCriteria().andEqualTo("orderId", orderReq.getOrderId())
@@ -148,17 +147,15 @@ public class OrderServiceImpl implements OrderService {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listOtherOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listOtherOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listOtherOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         } else {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listWaitOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listWaitOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listWaitOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         }
         return ReturnInfo.createReturnSucces(orders);
@@ -226,14 +223,22 @@ public class OrderServiceImpl implements OrderService {
                         order.setBroadband(value);
                         break;
                     }
+                    case 4: {
+                        order.setBackupFieldOne(value);
+                        break;
+                    }
+                    case 5: {
+                        order.setBackupFieldTwo(value);
+                        break;
+                    }
                     default:
                         break;
                 }
             }
             orders.add(order);
         }
-        Example example = new Example(MobileOrder.class);
         for (MobileOrder order : orders) {
+            Example example = new Example(MobileOrder.class);
             example.createCriteria().andEqualTo("mobileNumber", order.getMobileNumber());
             List<MobileOrder> oldOrders = orderDao.selectByExample(example);
             if (CollectionUtils.isEmpty(oldOrders)) {
@@ -307,9 +312,8 @@ public class OrderServiceImpl implements OrderService {
         cal.setTime(new Date());
         long nowTime = cal.getTimeInMillis();
         for (SysConfig tempConfig : configs) {
-            long newTime =
-                    nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
-                            * Constant.TIME.oneHourMillisecond;
+            long newTime = nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
+                    * Constant.TIME.oneHourMillisecond;
             Date date2 = new Date(newTime);
             switch (tempConfig.getId()) {
                 case Constant.SYS_CONFIG.RECIEVE_TIME_ID:
@@ -324,9 +328,8 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
-        List<MobileOrder> orders =
-                orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
-                        successTime);
+        List<MobileOrder> orders = orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime,
+                notSuccessTime, successTime);
         return orders;
     }
 
@@ -354,27 +357,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ReturnInfo orderCount(CountReq countReq) {
-        Example example = new Example(UserOrder.class);
-        Criteria criteria = example.createCriteria();
-        if (AuthCurrentUser.isManager()) {
-            criteria.andGreaterThanOrEqualTo("receiveTime", countReq.getStartTime())
-                    .andLessThanOrEqualTo("receiveTime", countReq.getEndTime());
-            if (!StringUtils.isEmpty(countReq.getJobNumber())) {
-                criteria.andEqualTo("jobNumber", countReq.getJobNumber());
-            }
-            if (!StringUtils.isEmpty(countReq.getMobileJobNumber())) {
-                criteria.andEqualTo("mobileJobNumber", countReq.getMobileJobNumber());
-            }
-        } else {
-            criteria.andGreaterThanOrEqualTo("receiveTime", countReq.getStartTime())
-                    .andLessThanOrEqualTo("receiveTime", countReq.getEndTime())
-                    .andEqualTo("userId", AuthCurrentUser.getUserId());
-        }
+        PageHelper.startPage(countReq.getPageNo(), countReq.getPageSize());
+        List<UserOrderQueryInfo> userOrderQueryInfos = orderDao.listOrderByCount(countReq);
         // 领单数
-        int recieveNum = userOrderDao.selectCountByExample(example);
-        criteria.andEqualTo("handSituation", Constant.ORDER.SUCCESS);
+        int recieveNum = userOrderQueryInfos.size();
         // 成功数
-        int successNum = userOrderDao.selectCountByExample(example);
+        int successNum = 0;
+        int totalPriceDiff = 0;
+        for (UserOrderQueryInfo userOrder : userOrderQueryInfos) {
+            System.out.println(userOrder.toString());
+            totalPriceDiff += userOrder.getPriceDifference();
+            if (userOrder.getHandSituation().equals(Constant.ORDER.SUCCESS)) {
+                successNum++;
+            }
+        }
         // 成功率
         BigDecimal recieve = new BigDecimal(recieveNum);
         BigDecimal success = new BigDecimal(successNum);
@@ -386,6 +382,8 @@ public class OrderServiceImpl implements OrderService {
         countRes.setRecieveNum(recieveNum);
         countRes.setSuccessNum(successNum);
         countRes.setSuccessRate(successRate.doubleValue());
+        countRes.setTotalPriceDiff(totalPriceDiff);
+        countRes.setUserOrderQueryInfos(userOrderQueryInfos);
         return ReturnInfo.createReturnSuccessOne(countRes);
     }
 }

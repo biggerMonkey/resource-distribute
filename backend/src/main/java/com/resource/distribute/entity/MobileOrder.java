@@ -17,6 +17,8 @@ public class MobileOrder {
     private String secondMeal;// 副套餐
     private String broadband;// 宽带情况
     private Integer isSensitive;// 是否为敏感 1->普通 2->敏感
+    private String backupFieldOne;
+    private String backupFieldTwo;
     private Integer createBy;
     private Integer updateBy;// 更新人
     private Date createTime;
@@ -108,5 +110,21 @@ public class MobileOrder {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getBackupFieldOne() {
+        return backupFieldOne;
+    }
+
+    public void setBackupFieldOne(String backupFieldOne) {
+        this.backupFieldOne = backupFieldOne;
+    }
+
+    public String getBackupFieldTwo() {
+        return backupFieldTwo;
+    }
+
+    public void setBackupFieldTwo(String backupFieldTwo) {
+        this.backupFieldTwo = backupFieldTwo;
     }
 }

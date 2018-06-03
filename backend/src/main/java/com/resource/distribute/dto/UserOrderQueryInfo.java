@@ -1,4 +1,4 @@
-package com.resource.distribute.entity;
+package com.resource.distribute.dto;
 
 import java.util.Date;
 
@@ -22,6 +22,11 @@ public class UserOrderQueryInfo {
     private String userName;// 姓名
     private String mobileJobNumber;// 移动工号
     private Date receiveTime;// 接收时间
+    private String mainCourse; // 主套餐
+    private String pairCourse; // 副套餐
+    private String broadbandInfo; // 宽带
+    private String newlyOpen; // 新开
+    private Integer priceDifference; // 价差
 
     public Integer getAreaId() {
         return areaId;
@@ -141,5 +146,58 @@ public class UserOrderQueryInfo {
 
     public void setReceiveTime(Date receiveTime) {
         this.receiveTime = receiveTime;
+    }
+
+    public String getMainCourse() {
+        return mainCourse;
+    }
+
+    public void setMainCourse(String mainCourse) {
+        this.mainCourse = mainCourse;
+    }
+
+    public String getPairCourse() {
+        return pairCourse;
+    }
+
+    public void setPairCourse(String pairCourse) {
+        this.pairCourse = pairCourse;
+    }
+
+    public String getBroadbandInfo() {
+        return broadbandInfo;
+    }
+
+    public void setBroadbandInfo(String broadbandInfo) {
+        this.broadbandInfo = broadbandInfo;
+    }
+
+    public String getNewlyOpen() {
+        return newlyOpen;
+    }
+
+    public void setNewlyOpen(String newlyOpen) {
+        this.newlyOpen = newlyOpen;
+    }
+
+    public Integer getPriceDifference() {
+        return priceDifference;
+    }
+
+    public void setPriceDifference(Integer priceDifference) {
+        this.priceDifference = priceDifference;
+    }
+
+    @Override
+    public String toString() {
+        return "UserOrderQueryInfo [areaId=" + areaId + ", mobileNumber=" + mobileNumber
+                + ", mainMeal=" + mainMeal + ", secondMeal=" + secondMeal + ", broadband="
+                + broadband + ", isSensitive=" + isSensitive + ", userId=" + userId + ", orderId="
+                + orderId + ", orderState=" + orderState + ", handSituation=" + handSituation
+                + ", remarks=" + remarks + ", jobNumber=" + jobNumber + ", userName=" + userName
+                + ", mobileJobNumber=" + mobileJobNumber + ", receiveTime=" + receiveTime
+                + ", mainCourse=" + mainCourse + ", pairCourse=" + pairCourse + ", broadbandInfo="
+                + broadbandInfo + ", newlyOpen=" + newlyOpen + ", priceDifference="
+                + priceDifference + "]";
     }
 }
