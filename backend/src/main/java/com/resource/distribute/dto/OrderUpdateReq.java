@@ -10,6 +10,12 @@ public class OrderUpdateReq {
     private String handSituation;// 办理情况
     private String remarks;
 
+    private String mainCourse; //主套餐
+    private String pairCourse; //副套餐
+    private String broadband; //宽带
+    private String newlyOpen; //新开
+    private String priceDifference; //价差
+
     public Integer getOrderId() {
         return orderId;
     }
@@ -40,5 +46,46 @@ public class OrderUpdateReq {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+
+    public String getMainCourse() {
+        return mainCourse;
+    }
+
+    public void setMainCourse(String mainCourse) {
+        this.mainCourse = mainCourse;
+    }
+
+    public String getPairCourse() {
+        return pairCourse;
+    }
+
+    public void setPairCourse(String pairCourse) {
+        this.pairCourse = pairCourse;
+    }
+
+    public String getBroadband() {
+        return broadband;
+    }
+
+    public void setBroadband(String broadband) {
+        this.broadband = broadband;
+    }
+
+    public String getNewlyOpen() {
+        return newlyOpen;
+    }
+
+    public void setNewlyOpen(String newlyOpen) {
+        this.newlyOpen = newlyOpen;
+    }
+
+    public String getPriceDifference() {
+        return priceDifference;
+    }
+
+    public void setPriceDifference(String priceDifference) {
+        this.priceDifference = priceDifference;
     }
 }
