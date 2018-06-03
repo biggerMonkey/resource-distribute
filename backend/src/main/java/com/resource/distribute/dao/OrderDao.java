@@ -77,15 +77,4 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
             + "<if test='queryReq.departmentId != null'> AND dev_id =#{queryReq.departmentId}</if>"
             + " </where> ORDER BY uo.receive_time </script>")
     public List<UserOrderQueryInfo> listOrderByCount(@Param("queryReq") CountReq queryReq);
-
-    @Select("<script>SELECT mo.area_id,mo.mobile_number,mo.main_meal,mo.second_meal,mo.broadband,mo.is_sensitive,uo.user_id,uo.order_id,"
-            + "uo.order_state,uo.hand_situation,uo.receive_time,uo.remarks,uo.job_number,uo.user_name,uo.dev_id,uo.mobile_job_number,uo.main_course,"
-            + "uo.pair_course,uo.broadband_info,uo.newly_open,uo.price_difference FROM mobile_order mo JOIN user_order uo ON mo.`id`=uo.`order_id` <where> "
-            + "<if test='countReq.jobNumber != null'>  AND job_number=#{countReq.jobNumber}</if>"
-            + "<if test='countReq.startTime != null'> AND receive_time &gt;= #{countReq.startTime}</if>"
-            + "<if test='countReq.endTime != null'> AND receive_time &lt; #{countReq.endTime}</if>"
-            + "<if test='countReq.mobileJobNumber != null'> AND mobile_job_number =#{countReq.mobileJobNumber}</if>"
-            + "<if test='countReq.departmentId != null'> AND dev_id =#{countReq.departmentId}</if>"
-            + " </where> ORDER BY uo.receive_time </script>")
-    public List<UserOrderQueryInfo> test(@Param("countReq") CountReq countReq);
 }
