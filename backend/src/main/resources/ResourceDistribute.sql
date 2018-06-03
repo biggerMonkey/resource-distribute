@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.08 (64 bit)
 MySQL - 5.6.24 : Database - resource_distribute
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -185,3 +186,21 @@ insert  into `user_order`(`id`,`user_id`,`order_id`,`order_state`,`hand_situatio
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+
+Drop table if exists `department`;
+
+CREATE TABLE `department` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`dep_name` varchar(256) NOT NULL comment '部门名称',
+`is_delete` smallint(6) DEFAULT '2' COMMENT '1->删除 2->未删除',
+`create_by` int(11) DEFAULT NULL,
+ `update_by` int(11) DEFAULT NULL,
+ `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+ `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
+
+
+alter table user add `dev_id` int(11) comment '部门id';

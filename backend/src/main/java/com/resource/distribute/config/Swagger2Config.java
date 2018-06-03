@@ -30,7 +30,7 @@ public class Swagger2Config {
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("com.dikong.lightcontroller.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.resource.distribute.controller"))
                 .paths(PathSelectors.any()).build().globalOperationParameters(setHeaderToken());
     }
 
@@ -39,7 +39,7 @@ public class Swagger2Config {
         List<Parameter> pars = new ArrayList<Parameter>();
         tokenPar.name("token").description("token").modelRef(new ModelRef("string"))
                 .parameterType("header").required(true).build();
-        pars.add(tokenPar.build());
+//        pars.add(tokenPar.build());
         return pars;
     }
 

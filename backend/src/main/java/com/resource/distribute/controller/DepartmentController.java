@@ -30,8 +30,8 @@ public class DepartmentController {
         return departmentService.add(department);
     }
 
-    @GetMapping("/list/{pageNum}?search={depName}")
-    public ReturnInfo listDepartment(@RequestParam("pageNum")Integer pageNum,@RequestParam("depName")String depName){
+    @GetMapping("/list/{pageNum}")
+    public ReturnInfo listDepartment(@PathVariable("pageNum")Integer pageNum,@RequestParam("search")String depName){
         if (depName != null && depName.length() == 0){
             depName = null;
         }
@@ -39,7 +39,7 @@ public class DepartmentController {
     }
 
     @DeleteMapping(path = "/del/{id}")
-    public ReturnInfo delDepart(@RequestParam("id")Integer id){
+    public ReturnInfo delDepart(@PathVariable("id")Integer id){
         if (id == 0 || id < 0){
             LOG.info("id:{}",id);
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
@@ -59,7 +59,7 @@ public class DepartmentController {
 
 
     @GetMapping(path = "/find/{id}")
-    public ReturnInfo find(@RequestParam("id")Integer id){
+    public ReturnInfo find(@PathVariable("id")Integer id){
         if (id == 0 || id < 0){
             LOG.info("id:{}",id);
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);

@@ -61,7 +61,7 @@ public class DepartmentServiceImple implements DepartmentService {
 
     @Override
     public ReturnInfo all() {
-        List<Department> departments = departmentDao.selectAll();
+        List<Department> departments = departmentDao.selectByNoDel();
         return ReturnInfo.createReturnSuccessOne(departments);
     }
 
