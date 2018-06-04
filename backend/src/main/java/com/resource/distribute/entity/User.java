@@ -3,6 +3,7 @@ package com.resource.distribute.entity;
 import java.util.Date;
 
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -27,7 +28,7 @@ public class User {
     private Date updateTime;
     private Integer createBy;
     private Integer updateBy;
-    @NotEmpty
+    @NotNull
     private Integer devId;
 
     public Integer getId() {

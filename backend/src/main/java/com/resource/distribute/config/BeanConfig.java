@@ -7,7 +7,6 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import tk.mybatis.spring.mapper.MapperScannerConfigurer;
 
@@ -36,15 +35,15 @@ public class BeanConfig {
         return configurer;
     }
 
-    @Bean(name = "multipartResolver")
-    public CommonsMultipartResolver multipartResolver() {
-        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        // resolver.setDefaultEncoding("UTF-8");
-        // resolver.setResolveLazily(true);// resolveLazily属性启用是为了推迟文件解析，以在在UploadAction中捕获文件大小异常
-        // resolver.setMaxInMemorySize(40960);
-        resolver.setMaxUploadSize(10 * 1024 * 1024);// 上传文件大小 5M 5*1024*1024
-        return resolver;
-    }
+    // @Bean(name = "multipartResolver")
+    // public CommonsMultipartResolver multipartResolver() {
+    // CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+    // // resolver.setDefaultEncoding("UTF-8");
+    // // resolver.setResolveLazily(true);// resolveLazily属性启用是为了推迟文件解析，以在在UploadAction中捕获文件大小异常
+    // // resolver.setMaxInMemorySize(40960);
+    // resolver.setMaxUploadSize(10 * 1024 * 1024);// 上传文件大小 5M 5*1024*1024
+    // return resolver;
+    // }
 
     @Bean
     @Primary
