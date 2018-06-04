@@ -216,7 +216,7 @@ public class OrderServiceImpl implements OrderService {
                 } else if (cell != null && cell.getCellTypeEnum().equals(CellType.NUMERIC)) {
                     value = String.valueOf(cell.getNumericCellValue());
                 } else {
-                    value = "非法数据类型";
+                    value = "";
                 }
                 switch (j) {
                     case 0: {
