@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import tk.mybatis.mapper.entity.Example;
 
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
@@ -45,8 +48,6 @@ import com.resource.distribute.entity.User;
 import com.resource.distribute.entity.UserOrder;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
-
-import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -80,6 +81,11 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setOrderState(orderReq.getState());
         userOrder.setHandSituation(orderReq.getHandSituation().trim());
         userOrder.setRemarks(orderReq.getRemarks());
+        userOrder.setMainCourse(orderReq.getMainCourse());
+        userOrder.setPairCourse(orderReq.getPairCourse());
+        userOrder.setBroadbandInfo(orderReq.getBroadband());
+        userOrder.setNewlyOpen(orderReq.getNewlyOpen());
+        userOrder.setPriceDifference(orderReq.getPriceDifference());
         userOrder.setUpdateBy(AuthCurrentUser.getUserId());
         userOrder.setDevId(AuthCurrentUser.get().getUserInfo().getDevId());
 
@@ -147,15 +153,17 @@ public class OrderServiceImpl implements OrderService {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listOtherOrder(queryReq, null);
             } else {
-                orders = orderDao.listOtherOrder(queryReq,
-                        AuthCurrentUser.get().getUserInfo().getJobNumber());
+                orders =
+                        orderDao.listOtherOrder(queryReq, AuthCurrentUser.get().getUserInfo()
+                                .getJobNumber());
             }
         } else {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listWaitOrder(queryReq, null);
             } else {
-                orders = orderDao.listWaitOrder(queryReq,
-                        AuthCurrentUser.get().getUserInfo().getJobNumber());
+                orders =
+                        orderDao.listWaitOrder(queryReq, AuthCurrentUser.get().getUserInfo()
+                                .getJobNumber());
             }
         }
         return ReturnInfo.createReturnSucces(orders);
@@ -200,11 +208,15 @@ public class OrderServiceImpl implements OrderService {
             Row row1 = sheet.getRow(i);
             for (int j = 0; j < tdLength; j++) {
                 // 得到Excel工作表指定行的单元格
-                Cell cell1 = row1.getCell(j);
+                Cell cell = row1.getCell(j);
                 // 获得每一列中的值
                 String value = "";
-                if (cell1 != null) {
-                    value = cell1.getStringCellValue();
+                if (cell != null & cell.getCellTypeEnum().equals(CellType.STRING)) {
+                    value = cell.getStringCellValue();
+                } else if (cell != null & cell.getCellTypeEnum().equals(CellType.NUMERIC)) {
+                    value = String.valueOf(cell.getNumericCellValue());
+                } else {
+                    value = "非法数据类型";
                 }
                 switch (j) {
                     case 0: {
@@ -312,8 +324,9 @@ public class OrderServiceImpl implements OrderService {
         cal.setTime(new Date());
         long nowTime = cal.getTimeInMillis();
         for (SysConfig tempConfig : configs) {
-            long newTime = nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
-                    * Constant.TIME.oneHourMillisecond;
+            long newTime =
+                    nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
+                            * Constant.TIME.oneHourMillisecond;
             Date date2 = new Date(newTime);
             switch (tempConfig.getId()) {
                 case Constant.SYS_CONFIG.RECIEVE_TIME_ID:
@@ -328,8 +341,9 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
-        List<MobileOrder> orders = orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime,
-                notSuccessTime, successTime);
+        List<MobileOrder> orders =
+                orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
+                        successTime);
         return orders;
     }
 

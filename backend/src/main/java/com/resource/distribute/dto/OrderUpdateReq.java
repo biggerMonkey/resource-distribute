@@ -10,11 +10,11 @@ public class OrderUpdateReq {
     private String handSituation;// 办理情况
     private String remarks;
 
-    private String mainCourse; //主套餐
-    private String pairCourse; //副套餐
-    private String broadband; //宽带
-    private String newlyOpen; //新开
-    private String priceDifference; //价差
+    private String mainCourse; // 主套餐
+    private String pairCourse; // 副套餐
+    private String broadband; // 宽带
+    private String newlyOpen; // 新开
+    private Integer priceDifference; // 价差
 
     public Integer getOrderId() {
         return orderId;
@@ -81,11 +81,11 @@ public class OrderUpdateReq {
         this.newlyOpen = newlyOpen;
     }
 
-    public String getPriceDifference() {
+    public Integer getPriceDifference() {
         return priceDifference;
     }
 
-    public void setPriceDifference(String priceDifference) {
+    public void setPriceDifference(Integer priceDifference) {
         this.priceDifference = priceDifference;
     }
 }
