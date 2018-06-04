@@ -2,6 +2,8 @@ package com.resource.distribute.dto;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * @author huangwenjun
  * @Date 2018年5月30日
@@ -21,12 +23,14 @@ public class UserOrderQueryInfo {
     private String jobNumber;// 工号
     private String userName;// 姓名
     private String mobileJobNumber;// 移动工号
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date receiveTime;// 接收时间
     private String mainCourse; // 主套餐
     private String pairCourse; // 副套餐
     private String broadbandInfo; // 宽带
     private String newlyOpen; // 新开
     private Integer priceDifference; // 价差
+    private Integer devId;// 部门id
 
     public Integer getAreaId() {
         return areaId;
@@ -186,6 +190,14 @@ public class UserOrderQueryInfo {
 
     public void setPriceDifference(Integer priceDifference) {
         this.priceDifference = priceDifference;
+    }
+
+    public Integer getDevId() {
+        return devId;
+    }
+
+    public void setDevId(Integer devId) {
+        this.devId = devId;
     }
 
     @Override
