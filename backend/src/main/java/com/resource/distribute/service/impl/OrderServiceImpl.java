@@ -36,6 +36,7 @@ import com.resource.distribute.dao.SysConfigDao;
 import com.resource.distribute.dao.UserOrderDao;
 import com.resource.distribute.dto.CountReq;
 import com.resource.distribute.dto.CountRes;
+import com.resource.distribute.dto.MobileOrderDto;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.OrderUpdateReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
@@ -279,10 +280,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
         receiveOrderReq.setPageSize(receiveOrderReq.getOrderNum());
-        List<MobileOrder> orders = searchOrder(receiveOrderReq);
+        List<MobileOrderDto> orders = searchOrder(receiveOrderReq);
         User user = AuthCurrentUser.get().getUserInfo();
         String orderIds = "";
-        for (MobileOrder order : orders) {
+        for (MobileOrderDto order : orders) {
             UserOrder userOrder = new UserOrder();
             userOrder.setUserId(user.getId());
             userOrder.setOrderId(order.getId());
@@ -298,7 +299,7 @@ public class OrderServiceImpl implements OrderService {
         return ReturnInfo.createReturnSuccessOne(orders.size());
     }
 
-    private List<MobileOrder> searchOrder(ReceiveOrderReq receiveOrderReq) {
+    private List<MobileOrderDto> searchOrder(ReceiveOrderReq receiveOrderReq) {
         // if (!StringUtils.isEmpty(receiveOrderReq.getUpValue())) {
         // String upValue = receiveOrderReq.getUpValue().trim();
         // String upNum = "0";
@@ -349,9 +350,17 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
-        List<MobileOrder> orders =
+        List<MobileOrderDto> orders =
                 orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
                         successTime);
+        List<Area> areas = areaDao.selectAll();
+        for (MobileOrderDto mobileOrder : orders) {
+            for (Area area : areas) {
+                if (area.getId().equals(mobileOrder.getAreaId())) {
+                    mobileOrder.setAreaName(area.getAreaName());
+                }
+            }
+        }
         return orders;
     }
 

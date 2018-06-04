@@ -7,7 +7,9 @@ package com.resource.distribute.common;
 public interface Constant {
     interface USER {
         Integer ADMIN = 1;
-        Integer NOT_ADMIN = 2;
+        Integer DEPARTMENT_ADMIN = 2;
+        Integer ORDINARY = 3;
+        Integer COUNT_USER = 4;
         int IS_DELETE = 1;
         int IS_NOT_DELETE = 2;
         int IS_ENABLE = 2;
@@ -41,7 +43,7 @@ public interface Constant {
         int SUCCESS_TIME_ID = 4;// 成功单子间隔时间配置id
     }
 
-    interface DEPARTMENT{
+    interface DEPARTMENT {
         int IS_DELETE = 1;
         int IS_NOT_DELETE = 2;
     }
