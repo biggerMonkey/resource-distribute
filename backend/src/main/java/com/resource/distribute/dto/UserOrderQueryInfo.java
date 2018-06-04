@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 public class UserOrderQueryInfo {
     private Integer areaId;// 关联的区域id
+    private String areaName;
     private String mobileNumber;// 手机号
     private String mainMeal;// 主套餐
     private String secondMeal;// 副套餐
@@ -38,6 +39,14 @@ public class UserOrderQueryInfo {
 
     public void setAreaId(Integer areaId) {
         this.areaId = areaId;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 
     public String getMobileNumber() {

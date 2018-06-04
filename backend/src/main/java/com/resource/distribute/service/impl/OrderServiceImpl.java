@@ -166,6 +166,14 @@ public class OrderServiceImpl implements OrderService {
                                 .getJobNumber());
             }
         }
+        List<Area> areas = areaDao.selectAll();
+        for (UserOrderQueryInfo userOrderQueryInfo : orders) {
+            for (Area area : areas) {
+                if (area.getId().equals(userOrderQueryInfo.getAreaId())) {
+                    userOrderQueryInfo.setAreaName(area.getAreaName());
+                }
+            }
+        }
         return ReturnInfo.createReturnSucces(orders);
     }
 
