@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import tk.mybatis.mapper.entity.Example;
-
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
@@ -49,6 +47,8 @@ import com.resource.distribute.entity.User;
 import com.resource.distribute.entity.UserOrder;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
+
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -157,17 +157,15 @@ public class OrderServiceImpl implements OrderService {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listOtherOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listOtherOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listOtherOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         } else {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listWaitOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listWaitOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listWaitOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         }
         List<Area> areas = areaDao.selectAll();
@@ -226,7 +224,9 @@ public class OrderServiceImpl implements OrderService {
                 if (cell != null && cell.getCellTypeEnum().equals(CellType.STRING)) {
                     value = cell.getStringCellValue();
                 } else if (cell != null && cell.getCellTypeEnum().equals(CellType.NUMERIC)) {
-                    value = String.valueOf(cell.getNumericCellValue());
+                    BigDecimal bd = new BigDecimal(cell.getNumericCellValue());
+                    value = bd.toPlainString();
+                    // value = String.valueOf(cell.getNumericCellValue());
                 } else {
                     value = "";
                 }
@@ -336,9 +336,8 @@ public class OrderServiceImpl implements OrderService {
         cal.setTime(new Date());
         long nowTime = cal.getTimeInMillis();
         for (SysConfig tempConfig : configs) {
-            long newTime =
-                    nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
-                            * Constant.TIME.oneHourMillisecond;
+            long newTime = nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
+                    * Constant.TIME.oneHourMillisecond;
             Date date2 = new Date(newTime);
             switch (tempConfig.getId()) {
                 case Constant.SYS_CONFIG.RECIEVE_TIME_ID:
@@ -353,9 +352,8 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
-        List<MobileOrderDto> orders =
-                orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
-                        successTime);
+        List<MobileOrderDto> orders = orderDao.recieveListOrder(receiveOrderReq,
+                recieveIntervalTime, notSuccessTime, successTime);
         List<Area> areas = areaDao.selectAll();
         for (MobileOrderDto mobileOrder : orders) {
             for (Area area : areas) {
