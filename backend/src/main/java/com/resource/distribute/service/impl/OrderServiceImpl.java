@@ -211,9 +211,9 @@ public class OrderServiceImpl implements OrderService {
                 Cell cell = row1.getCell(j);
                 // 获得每一列中的值
                 String value = "";
-                if (cell != null & cell.getCellTypeEnum().equals(CellType.STRING)) {
+                if (cell != null && cell.getCellTypeEnum().equals(CellType.STRING)) {
                     value = cell.getStringCellValue();
-                } else if (cell != null & cell.getCellTypeEnum().equals(CellType.NUMERIC)) {
+                } else if (cell != null && cell.getCellTypeEnum().equals(CellType.NUMERIC)) {
                     value = String.valueOf(cell.getNumericCellValue());
                 } else {
                     value = "非法数据类型";
