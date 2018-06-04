@@ -2,6 +2,8 @@ package com.resource.distribute.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * @author huangwenjun
  * @version 2018年5月29日 下午10:41:14
@@ -20,7 +22,9 @@ public class UserOrder {
     private Date receiveTime;
     private Integer createBy;
     private Integer updateBy;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     private String mainCourse; // 主套餐

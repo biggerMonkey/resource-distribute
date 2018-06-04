@@ -6,10 +6,10 @@ package com.resource.distribute.common;
  */
 public interface Constant {
     interface USER {
-        Integer ADMIN = 1;
-        Integer DEPARTMENT_ADMIN = 2;
-        Integer ORDINARY = 3;
-        Integer COUNT_USER = 4;
+        int ADMIN = 1;
+        int DEPARTMENT_ADMIN = 2;
+        int ORDINARY = 3;
+        int COUNT_USER = 4;
         int IS_DELETE = 1;
         int IS_NOT_DELETE = 2;
         int IS_ENABLE = 2;

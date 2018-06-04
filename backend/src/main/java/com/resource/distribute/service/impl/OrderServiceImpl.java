@@ -77,6 +77,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public synchronized ReturnInfo updateOrder(OrderUpdateReq orderReq) {
         UserOrder userOrder = new UserOrder();
+        if (orderReq.getOrderId() == null) {
+            return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
+        }
         userOrder.setOrderId(orderReq.getOrderId());
         userOrder.setUserId(AuthCurrentUser.getUserId());
         userOrder.setOrderState(orderReq.getState());
@@ -389,6 +392,19 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ReturnInfo orderCount(CountReq countReq) {
         PageHelper.startPage(countReq.getPageNo(), countReq.getPageSize());
+        switch (AuthCurrentUser.getUserInfo().getRoleType()) {
+            case Constant.USER.DEPARTMENT_ADMIN:
+                countReq.setDepartmentId(AuthCurrentUser.getDepartMentId());
+                break;
+            case Constant.USER.ORDINARY:
+                countReq.setJobNumber(AuthCurrentUser.getUserInfo().getJobNumber());
+                break;
+            default:
+                break;
+        }
+        if (AuthCurrentUser.isDepartManager()) {
+            countReq.setDepartmentId(AuthCurrentUser.getDepartMentId());
+        }
         List<UserOrderQueryInfo> userOrderQueryInfos = orderDao.listOrderByCount(countReq);
         // 领单数
         int recieveNum = userOrderQueryInfos.size();
