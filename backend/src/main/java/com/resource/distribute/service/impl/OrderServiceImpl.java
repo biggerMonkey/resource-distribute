@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import tk.mybatis.mapper.entity.Example;
-
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
@@ -49,6 +47,8 @@ import com.resource.distribute.entity.User;
 import com.resource.distribute.entity.UserOrder;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
+
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -157,17 +157,15 @@ public class OrderServiceImpl implements OrderService {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listOtherOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listOtherOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listOtherOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         } else {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listWaitOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listWaitOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listWaitOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         }
         List<Area> areas = areaDao.selectAll();
@@ -267,113 +265,44 @@ public class OrderServiceImpl implements OrderService {
             orders.add(order);
         }
 
-        Example allExample = new Example(MobileOrder.class);
-        allExample.createCriteria().andIn("mobileNumber", phoneNumbers);
+        // Example allExample = new Example(MobileOrder.class);
+        // allExample.createCriteria().andIn("mobileNumber", phoneNumbers);
         // int delNums = orderDao.deleteByExample(allExample);
-        List<MobileOrder> oldOrders = orderDao.selectByExample(allExample);
         List<MobileOrder> addOrders = new ArrayList<MobileOrder>();
-        List<MobileOrder> updateOrders = new ArrayList<MobileOrder>();
         boolean flag = true;
-
-
         for (MobileOrder order : orders) {// excel中新数据
-            for (MobileOrder tempOrder : oldOrders) {// 根据手机号查询出来的旧数据
-                if (order.getIsSensitive().equals(Constant.ORDER.SENSITIVE)) {// 如果是敏感数据，丢弃
-                    continue;
-                } else if (tempOrder.getMobileNumber().equals(order.getMobileNumber())) {// 手机号相同的时候，需要做更新操作
-                    // MobileOrder updateOrder = new MobileOrder();
-                    boolean updateFlag = true;
-                    for (MobileOrder updateOrder : updateOrders) {// 查看更新列表中是否存在
-                        if (tempOrder.getMobileNumber().equals(updateOrder.getMobileNumber())) {// 如果存在
-                            if (!StringUtils.isEmpty(order.getMainMeal())) {
-                                updateOrder.setMainMeal(order.getMainMeal());
-                            }
-                            if (!StringUtils.isEmpty(order.getSecondMeal())) {
-                                updateOrder.setSecondMeal(order.getSecondMeal());
-                            }
-                            if (!StringUtils.isEmpty(order.getBroadband())) {
-                                updateOrder.setBroadband(order.getBroadband());
-                            }
-                            if (!StringUtils.isEmpty(order.getBackupFieldOne())) {
-                                updateOrder.setBackupFieldOne(order.getBackupFieldOne());
-                            }
-                            if (!StringUtils.isEmpty(order.getBackupFieldTwo())) {
-                                updateOrder.setBackupFieldTwo(order.getBackupFieldTwo());
-                            }
-                            updateFlag = false;
-                        }
-                    }
-                    if (!updateFlag) {// 不存在
-                        break;
-                    }
-                    // 不存在则新增一个需要更新的对象
-                    // MobileOrder updateOrder = new MobileOrder();
+            for (MobileOrder addOrder : addOrders) {
+                if (order.getMobileNumber().equals(addOrder.getMobileNumber())) {
                     if (!StringUtils.isEmpty(order.getMainMeal())) {
-                        tempOrder.setMainMeal(order.getMainMeal());
+                        addOrder.setMainMeal(order.getMainMeal());
                     }
                     if (!StringUtils.isEmpty(order.getSecondMeal())) {
-                        tempOrder.setSecondMeal(order.getSecondMeal());
+                        addOrder.setSecondMeal(order.getSecondMeal());
                     }
                     if (!StringUtils.isEmpty(order.getBroadband())) {
-                        tempOrder.setBroadband(order.getBroadband());
+                        addOrder.setBroadband(order.getBroadband());
                     }
                     if (!StringUtils.isEmpty(order.getBackupFieldOne())) {
-                        tempOrder.setBackupFieldOne(order.getBackupFieldOne());
+                        addOrder.setBackupFieldOne(order.getBackupFieldOne());
                     }
                     if (!StringUtils.isEmpty(order.getBackupFieldTwo())) {
-                        tempOrder.setBackupFieldTwo(order.getBackupFieldTwo());
+                        addOrder.setBackupFieldTwo(order.getBackupFieldTwo());
                     }
-                    updateOrders.add(order);
                     flag = false;
-                }
-            }
-            if (flag) {// 需要新增的单子
-                boolean addFlag = true;
-                for (MobileOrder addOrder : addOrders) {// 查询新增列表
-                    if (order.getMobileNumber().equals(addOrder.getMobileNumber())) {// 如果存在
-                        if (!StringUtils.isEmpty(order.getMainMeal())) {
-                            addOrder.setMainMeal(order.getMainMeal());
-                        }
-                        if (!StringUtils.isEmpty(order.getSecondMeal())) {
-                            addOrder.setSecondMeal(order.getSecondMeal());
-                        }
-                        if (!StringUtils.isEmpty(order.getBroadband())) {
-                            addOrder.setBroadband(order.getBroadband());
-                        }
-                        if (!StringUtils.isEmpty(order.getBackupFieldOne())) {
-                            addOrder.setBackupFieldOne(order.getBackupFieldOne());
-                        }
-                        if (!StringUtils.isEmpty(order.getBackupFieldTwo())) {
-                            addOrder.setBackupFieldTwo(order.getBackupFieldTwo());
-                        }
-                        addFlag = false;
-                    }
-                }
-                if (!addFlag) {
                     break;
                 }
+            }
+            if (flag) {
                 addOrders.add(order);
-                flag = true;
             }
         }
-
-        // for (MobileOrder tempOrder : mobileOrders) {
-        // for (MobileOrder order : orders) {
-        // if (order.getMobileNumber().equals(tempOrder.getMobileNumber())) {
-        // }
-        // }
-        // }
-        // for (MobileOrder order : orders) {
-        // Example example = new Example(MobileOrder.class);
-        // example.createCriteria().andEqualTo("mobileNumber", order.getMobileNumber());
-        // List<MobileOrder> oldOrders = orderDao.selectByExample(example);
-        // if (CollectionUtils.isEmpty(oldOrders)) {
-        // orderDao.insertSelective(order);
-        // } else {
-        // orderDao.updateByExample(order, example);
-        // }
-        // }
-        int addNums = orderDao.insertList(addOrders);
+        int addNums = 0;
+        if (addOrders.size() != 0) {
+            // for (int i = 0; i < addOrders.size(); i += 1000) {
+            // addNums = orderDao.insertListOnUpdate(addOrders.subList(i, i + 1000));
+            // }
+            addNums = orderDao.insertListOnUpdate(addOrders);
+        }
         return ReturnInfo.createReturnSuccessOne(addNums);
     }
 
@@ -439,9 +368,8 @@ public class OrderServiceImpl implements OrderService {
         cal.setTime(new Date());
         long nowTime = cal.getTimeInMillis();
         for (SysConfig tempConfig : configs) {
-            long newTime =
-                    nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
-                            * Constant.TIME.oneHourMillisecond;
+            long newTime = nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
+                    * Constant.TIME.oneHourMillisecond;
             Date date2 = new Date(newTime);
             switch (tempConfig.getId()) {
                 case Constant.SYS_CONFIG.RECIEVE_TIME_ID:
@@ -456,9 +384,8 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
-        List<MobileOrderDto> orders =
-                orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
-                        successTime);
+        List<MobileOrderDto> orders = orderDao.recieveListOrder(receiveOrderReq,
+                recieveIntervalTime, notSuccessTime, successTime);
         List<Area> areas = areaDao.selectAll();
         for (MobileOrderDto mobileOrder : orders) {
             for (Area area : areas) {
