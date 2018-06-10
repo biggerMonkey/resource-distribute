@@ -6,15 +6,15 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import tk.mybatis.mapper.common.Mapper;
-import tk.mybatis.mapper.common.special.InsertListMapper;
-
 import com.resource.distribute.dto.CountReq;
 import com.resource.distribute.dto.MobileOrderDto;
 import com.resource.distribute.dto.OrderQueryReq;
 import com.resource.distribute.dto.ReceiveOrderReq;
 import com.resource.distribute.dto.UserOrderQueryInfo;
 import com.resource.distribute.entity.MobileOrder;
+
+import tk.mybatis.mapper.common.Mapper;
+import tk.mybatis.mapper.common.special.InsertListMapper;
 
 /**
  * @author huangwenjun
@@ -43,17 +43,14 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
 
 
     @Select("<script>SELECT * FROM mobile_order mo LEFT JOIN user_order uo ON mo.id=uo.order_id "
-            + "<where>"
-            + "<if test='receiveOrderReq.areaId != null'> "
+            + "<where>" + "<if test='receiveOrderReq.areaId != null'> "
             + " AND mo.area_id=#{receiveOrderReq.areaId} </if>"
             + "<if test='receiveOrderReq.mainMeal != null'>"
             + "   AND mo.main_meal=#{receiveOrderReq.mainMeal} </if>"
             + "<if test='receiveOrderReq.secondMeal != null'>"
             + "   AND mo.second_meal=#{receiveOrderReq.secondMeal} </if>"
-            + "<if test='receiveOrderReq.broadband == 1'>"
-            + "   AND mo.broadband !='' </if>"
-            + "<if test='receiveOrderReq.broadband == 2'>"
-            + "   AND mo.broadband ='' </if>"
+            + "<if test='receiveOrderReq.broadband == 1'>" + "   AND mo.broadband !='' </if>"
+            + "<if test='receiveOrderReq.broadband == 2'>" + "   AND mo.broadband ='' </if>"
             + "<if test='receiveOrderReq.mobileNumber != null'>"
             + "   AND mobile_number like concat(concat('%',#{receiveOrderReq.mobileNumber}),'%') </if> "
             + " AND (uo.order_id IN(SELECT order_id FROM user_order WHERE receive_time &lt;= #{recieveIntervalTime} AND hand_situation ='待拨打' )"
@@ -63,7 +60,8 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
     public List<MobileOrderDto> recieveListOrder(
             @Param("receiveOrderReq") ReceiveOrderReq receiveOrderReq,
             @Param("recieveIntervalTime") String recieveIntervalTime,
-            @Param("notSuccessTime") String notSuccessTime, @Param("successTime") String successTime);
+            @Param("notSuccessTime") String notSuccessTime,
+            @Param("successTime") String successTime);
 
     @Select("SELECT DISTINCT main_meal FROM mobile_order")
     public List<String> getListMainMeal();
@@ -73,7 +71,8 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
 
     @Select("<script>SELECT area_id,mobile_number,main_meal,second_meal,broadband,is_sensitive,user_id,order_id,"
             + "order_state,hand_situation,receive_time,remarks,job_number,user_name,dev_id,mobile_job_number,main_course,"
-            + "pair_course,broadband_info,newly_open,price_difference FROM mobile_order mo JOIN user_order uo ON mo.`id`=uo.`order_id` <where> "
+            + "pair_course,broadband_info,newly_open,price_difference,dep_name FROM mobile_order mo JOIN user_order uo ON mo.`id`=uo.`order_id` "
+            + " JOIN department d ON d.id =uo.dev_id<where> "
             + "<if test='queryReq.jobNumber != null'>  AND job_number=#{queryReq.jobNumber}</if>"
             + "<if test='queryReq.startTime != null'> AND receive_time &gt;= #{queryReq.startTime}</if>"
             + "<if test='queryReq.endTime != null'> AND receive_time &lt; #{queryReq.endTime}</if>"

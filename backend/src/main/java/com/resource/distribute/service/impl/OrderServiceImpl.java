@@ -327,6 +327,7 @@ public class OrderServiceImpl implements OrderService {
             userOrder.setMobileJobNumber(AuthCurrentUser.getMobileJobNum());
             userOrder.setReceiveTime(new Date());
             userOrder.setHandSituation(Constant.ORDER.DEFAULT_SISUATION);
+            userOrder.setDevId(AuthCurrentUser.getDepartMentId());
             userOrderDao.insertSelective(userOrder);
             orderIds += order.getId() + " ";
         }

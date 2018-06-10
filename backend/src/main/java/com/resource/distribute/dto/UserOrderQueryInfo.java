@@ -32,6 +32,7 @@ public class UserOrderQueryInfo {
     private String newlyOpen; // 新开
     private Integer priceDifference; // 价差
     private Integer devId;// 部门id
+    private String depName;
 
     public Integer getAreaId() {
         return areaId;
@@ -209,16 +210,25 @@ public class UserOrderQueryInfo {
         this.devId = devId;
     }
 
+    public String getDepName() {
+        return depName;
+    }
+
+    public void setDepName(String depName) {
+        this.depName = depName;
+    }
+
     @Override
     public String toString() {
-        return "UserOrderQueryInfo [areaId=" + areaId + ", mobileNumber=" + mobileNumber
-                + ", mainMeal=" + mainMeal + ", secondMeal=" + secondMeal + ", broadband="
-                + broadband + ", isSensitive=" + isSensitive + ", userId=" + userId + ", orderId="
-                + orderId + ", orderState=" + orderState + ", handSituation=" + handSituation
-                + ", remarks=" + remarks + ", jobNumber=" + jobNumber + ", userName=" + userName
-                + ", mobileJobNumber=" + mobileJobNumber + ", receiveTime=" + receiveTime
-                + ", mainCourse=" + mainCourse + ", pairCourse=" + pairCourse + ", broadbandInfo="
-                + broadbandInfo + ", newlyOpen=" + newlyOpen + ", priceDifference="
-                + priceDifference + "]";
+        return "UserOrderQueryInfo [areaId=" + areaId + ", areaName=" + areaName + ", mobileNumber="
+                + mobileNumber + ", mainMeal=" + mainMeal + ", secondMeal=" + secondMeal
+                + ", broadband=" + broadband + ", isSensitive=" + isSensitive + ", userId=" + userId
+                + ", orderId=" + orderId + ", orderState=" + orderState + ", handSituation="
+                + handSituation + ", remarks=" + remarks + ", jobNumber=" + jobNumber
+                + ", userName=" + userName + ", mobileJobNumber=" + mobileJobNumber
+                + ", receiveTime=" + receiveTime + ", mainCourse=" + mainCourse + ", pairCourse="
+                + pairCourse + ", broadbandInfo=" + broadbandInfo + ", newlyOpen=" + newlyOpen
+                + ", priceDifference=" + priceDifference + ", devId=" + devId + ", depName="
+                + depName + "]";
     }
 }
