@@ -26,6 +26,7 @@ public interface Constant {
         String SUCCESS = "成功";
         Integer SENSITIVE = 2;
         Integer NOT_SENSITIVE = 1;
+        int MAX_WAIT_NUM = 30;
     }
     interface TIME {
         int SECOND = 1;

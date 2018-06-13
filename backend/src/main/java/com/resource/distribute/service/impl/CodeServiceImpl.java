@@ -1,5 +1,6 @@
 package com.resource.distribute.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import com.resource.distribute.dao.CodeDao;
 import com.resource.distribute.entity.Code;
 import com.resource.distribute.service.CodeService;
 import com.resource.distribute.utils.AuthCurrentUser;
+import com.resource.distribute.utils.TreeNode;
+import com.resource.distribute.utils.TreeNodebuild;
 
 /**
  * @author huangwenjun
@@ -52,8 +55,18 @@ public class CodeServiceImpl implements CodeService {
     public ReturnInfo listById(Integer parentId) {
         Example example = new Example(Code.class);
         example.createCriteria().andEqualTo("parentId", parentId);
-        List<Code> codes = codeDao.selectByExample(example);
-        return ReturnInfo.createReturnSuccessOne(codes);
+        List<Code> codes = codeDao.selectAll();
+        List<TreeNode> treeNodes = new ArrayList<>();
+        codes.forEach(code -> {
+            TreeNode treeNode = new TreeNode();
+            treeNode.setId(String.valueOf(code.getId()));
+            treeNode.setName(code.getContent());
+            treeNode.setParentId(String.valueOf(code.getParentId()));
+            treeNodes.add(treeNode);
+        });
+        List<TreeNodebuild> treeNodebuildList =
+                TreeNodebuild.toTreeNodes(treeNodes, String.valueOf(parentId));
+        return ReturnInfo.createReturnSuccessOne(treeNodebuildList);
     }
 
 }
