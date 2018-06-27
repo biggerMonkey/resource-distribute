@@ -18,7 +18,7 @@ public interface UserService {
 
     public ReturnInfo listUsers(QueryUserReq queryUserReq);
 
-    public ReturnInfo login(LoginReq loginReq);
+    public ReturnInfo login(LoginReq loginReq, String ip);
 
     public ReturnInfo checkMobile(String token, String mobileJonNumber);
 }

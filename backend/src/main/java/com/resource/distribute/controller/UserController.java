@@ -1,9 +1,10 @@
 package com.resource.distribute.controller;
 
+import io.swagger.annotations.Api;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import com.resource.distribute.dto.LoginReq;
 import com.resource.distribute.dto.QueryUserReq;
 import com.resource.distribute.entity.User;
 import com.resource.distribute.service.UserService;
+import com.resource.distribute.utils.IPUtil;
 import com.resource.distribute.utils.ValidateLogUtils;
 
 /**
@@ -69,9 +71,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ReturnInfo login(@RequestBody LoginReq loginReq) {
+    public ReturnInfo login(@RequestBody LoginReq loginReq, HttpServletRequest request) {
         LOG.info("用户登陆：" + JSON.toJSONString(loginReq));
-        return userService.login(loginReq);
+        String ip = IPUtil.getIpAddr(request);
+        return userService.login(loginReq, ip);
     }
 
     @RequestMapping("/check/{mobile-job-number}")

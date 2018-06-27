@@ -396,9 +396,14 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
-        List<MobileOrderDto> orders =
-                orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
-                        successTime);
+        List<MobileOrderDto> orders = new ArrayList<MobileOrderDto>();
+        if (AuthCurrentUser.isManager()) {
+            orders = orderDao.recieveListOrderAdmin(receiveOrderReq);
+        } else {
+            orders =
+                    orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
+                            successTime);
+        }
         List<Area> areas = areaDao.selectAll();
         for (MobileOrderDto mobileOrder : orders) {
             for (Area area : areas) {
@@ -410,7 +415,7 @@ public class OrderServiceImpl implements OrderService {
         return orders;
     }
 
-    void insertRecord(String content, Integer orderId) {
+    public void insertRecord(String content, Integer orderId) {
         Record record = new Record();
         record.setJobNum(AuthCurrentUser.get().getUserInfo().getJobNumber());
         record.setUserName(AuthCurrentUser.get().getUserInfo().getUserName());

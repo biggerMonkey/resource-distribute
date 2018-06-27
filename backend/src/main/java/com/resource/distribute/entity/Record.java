@@ -2,6 +2,8 @@ package com.resource.distribute.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * @author huangwenjun
  * @version 2018年5月22日 下午10:57:23
@@ -13,6 +15,7 @@ public class Record {
     private String mobileJobNum;
     private String content;
     private Integer orderId;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     public Integer getId() {
@@ -74,7 +77,7 @@ public class Record {
     @Override
     public String toString() {
         return "Record [id=" + id + ", jobNum=" + jobNum + ", userName=" + userName
-                + ", mobileJobNum=" + mobileJobNum + ", content=" + content + ", orderId=" + orderId
-                + ", createTime=" + createTime + "]";
+                + ", mobileJobNum=" + mobileJobNum + ", content=" + content + ", orderId="
+                + orderId + ", createTime=" + createTime + "]";
     }
 }

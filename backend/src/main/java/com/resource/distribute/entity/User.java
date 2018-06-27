@@ -21,6 +21,8 @@ public class User {
     private String userName;// 姓名
     @NotEmpty
     private String password;// 密码
+    private String ip;
+    private String loginTime;
     private Integer isEnable;// 1->禁用 2->启用
     private Integer isDelete;// 1->删除 2->未删除
     private Integer roleType;// 1->管理员 2->普通用户
@@ -141,5 +143,21 @@ public class User {
 
     public void setDevId(Integer devId) {
         this.devId = devId;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLoginTime(String loginTime) {
+        this.loginTime = loginTime;
     }
 }
