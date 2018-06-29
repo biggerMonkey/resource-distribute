@@ -19,7 +19,6 @@ public class User {
     private String jobNumber;// 工号
     @NotEmpty
     private String userName;// 姓名
-    @NotEmpty
     private String password;// 密码
     private String ip;
     private String loginTime;

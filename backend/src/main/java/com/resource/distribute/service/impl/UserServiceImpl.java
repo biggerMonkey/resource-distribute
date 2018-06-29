@@ -64,6 +64,9 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isEmpty(user.getIp()) && user.getIp().indexOf("/") < 0) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
         }
+        if (StringUtils.isEmpty(user.getPassword())) {
+            return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
+        }
         DB.maxUserJobNumber = String.valueOf(Integer.valueOf(DB.maxUserJobNumber) + 1);
         user.setJobNumber(DB.maxUserJobNumber);
         user.setPassword(MD5Util.getMD5Str(user.getPassword()));
@@ -78,7 +81,7 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isEmpty(user.getIp()) && user.getIp().indexOf("/") < 0) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
         }
-        if (StringUtils.isEmpty(user.getPassword())) {
+        if (!StringUtils.isEmpty(user.getPassword())) {
             user.setPassword(MD5Util.getMD5Str(user.getPassword()));
         }
         user.setJobNumber(null);
@@ -174,7 +177,7 @@ public class UserServiceImpl implements UserService {
 
                 } else {
                     return ReturnInfo.create(CodeEnum.LOGIN_TIME_ERROR.getCode(),
-                            CodeEnum.LOGIN_TIME_ERROR + ":" + time);
+                            CodeEnum.LOGIN_TIME_ERROR.getMsg() + ":" + time);
                 }
             }
         }
