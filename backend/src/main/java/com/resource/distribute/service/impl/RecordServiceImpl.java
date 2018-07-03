@@ -25,7 +25,7 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public ReturnInfo logList(RecordQueryReq logQueryReq) {
         PageHelper.startPage(logQueryReq.getPageNo(), logQueryReq.getPageSize());
-        List<Record> records = recordDao.selectAll();
+        List<Record> records = recordDao.selectAllRecord();
         return ReturnInfo.createReturnSucces(records);
     }
 

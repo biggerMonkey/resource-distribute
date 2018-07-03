@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import strman.Strman;
 import tk.mybatis.mapper.entity.Example;
 
 import com.github.pagehelper.PageHelper;
@@ -271,8 +273,9 @@ public class OrderServiceImpl implements OrderService {
         // allExample.createCriteria().andIn("mobileNumber", phoneNumbers);
         // int delNums = orderDao.deleteByExample(allExample);
         List<MobileOrder> addOrders = new ArrayList<MobileOrder>();
-        boolean flag = true;
+
         for (MobileOrder order : orders) {// excel中新数据
+            boolean flag = true;
             for (MobileOrder addOrder : addOrders) {
                 if (order.getMobileNumber().equals(addOrder.getMobileNumber())) {
                     if (!StringUtils.isEmpty(order.getMainMeal())) {
@@ -298,14 +301,44 @@ public class OrderServiceImpl implements OrderService {
                 addOrders.add(order);
             }
         }
-        int addNums = 0;
+        Example example = new Example(MobileOrder.class);
+        example.createCriteria().andIn("mobileNumber", phoneNumbers);
+        List<MobileOrder> oldOrders = orderDao.selectByExample(example);
+        int updateNums = 0;
+        int sensitiveNum = 0;
+        int meragNum = orders.size() - addOrders.size();
+        for (MobileOrder temp : oldOrders) {
+            for (String phoneNumber : phoneNumbers) {
+                if (temp.getMobileNumber().equals(phoneNumber)) {
+                    updateNums++;
+                    if (temp.getIsSensitive().equals(Constant.ORDER.SENSITIVE)) {// 敏感数据不导入
+                        sensitiveNum++;
+                        Iterator<MobileOrder> iterator = addOrders.iterator();
+                        while (iterator.hasNext()) {
+                            MobileOrder delOrder = (MobileOrder) iterator.next();
+                            if (delOrder.getMobileNumber().equals(phoneNumber)) {
+                                iterator.remove();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (orderType.equals(Constant.ORDER.SENSITIVE)) {
+            sensitiveNum = orders.size();
+        }
+        int addNums = phoneNumbers.size() - updateNums;
         if (addOrders.size() != 0) {
             // for (int i = 0; i < addOrders.size(); i += 1000) {
             // addNums = orderDao.insertListOnUpdate(addOrders.subList(i, i + 1000));
             // }
-            addNums = orderDao.insertListOnUpdate(addOrders);
+            orderDao.insertListOnUpdate(addOrders);
         }
-        return ReturnInfo.createReturnSuccessOne(addNums);
+        String msg =
+                Strman.append("本次导入数据共" + orders.size(), "条，其中新数据" + addNums, "条，合并数据" + meragNum,
+                        "条，敏感数据" + sensitiveNum, "条。");
+        LOG.info(msg);
+        return ReturnInfo.createReturnSuccessOne(msg);
     }
 
     @Override
