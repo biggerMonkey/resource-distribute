@@ -348,7 +348,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
+    public synchronized ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
         Example example = new Example(UserOrder.class);
         example.createCriteria().andEqualTo("handSituation", Constant.ORDER.DEFAULT_SISUATION)
                 .andEqualTo("userId", AuthCurrentUser.getUserId());
