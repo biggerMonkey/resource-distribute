@@ -361,6 +361,7 @@ public class OrderServiceImpl implements OrderService {
         List<MobileOrderDto> orders = searchOrder(receiveOrderReq);
         User user = AuthCurrentUser.get().getUserInfo();
         String orderIds = "";
+        List<UserOrder> insertOrder = new ArrayList<UserOrder>();
         for (MobileOrderDto order : orders) {
             UserOrder userOrder = new UserOrder();
             userOrder.setUserId(user.getId());
@@ -371,9 +372,22 @@ public class OrderServiceImpl implements OrderService {
             userOrder.setReceiveTime(new Date());
             userOrder.setHandSituation(Constant.ORDER.DEFAULT_SISUATION);
             userOrder.setDevId(AuthCurrentUser.getDepartMentId());
-            userOrderDao.insertSelective(userOrder);
+            userOrder.setMainCourse("");
+            userOrder.setPairCourse("");
+            userOrder.setBroadbandInfo("");
+            userOrder.setNewlyOpen("");
+            userOrder.setPriceDifference(0);
+            userOrder.setCreateBy(AuthCurrentUser.getUserId());
+            userOrder.setRemarks("");
+            userOrder.setOrderState("");
+            Date now = new Date();
+            userOrder.setCreateTime(now);
+            userOrder.setUpdateTime(now);
+            insertOrder.add(userOrder);
+            // userOrderDao.insertSelective(userOrder);
             orderIds += order.getId() + " ";
         }
+        userOrderDao.insertList(insertOrder);
         insertRecord("领取单子:数量->" + orders.size() + " 单子id->" + orderIds, null);
         return ReturnInfo.createReturnSuccessOne(orders.size());
     }
