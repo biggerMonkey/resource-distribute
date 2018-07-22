@@ -24,9 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import strman.Strman;
-import tk.mybatis.mapper.entity.Example;
-
 import com.github.pagehelper.PageHelper;
 import com.resource.distribute.common.CodeEnum;
 import com.resource.distribute.common.Constant;
@@ -51,6 +48,9 @@ import com.resource.distribute.entity.User;
 import com.resource.distribute.entity.UserOrder;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
+
+import strman.Strman;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * @author huangwenjun
@@ -94,13 +94,13 @@ public class OrderServiceImpl implements OrderService {
         userOrder.setPriceDifference(orderReq.getPriceDifference());
         userOrder.setUpdateBy(AuthCurrentUser.getUserId());
         userOrder.setDevId(AuthCurrentUser.get().getUserInfo().getDevId());
-
+        // 更新当前单子
         Example userOrderExample = new Example(UserOrder.class);
         userOrderExample.createCriteria().andEqualTo("orderId", orderReq.getOrderId())
                 .andEqualTo("userId", AuthCurrentUser.getUserId());
         userOrderDao.updateByExampleSelective(userOrder, userOrderExample);
         insertRecord("更新 orderId->", orderReq.getOrderId());
-
+        // 查询要改变套餐的次数
         Example orderExample = new Example(UserOrder.class);
         orderExample.createCriteria().andEqualTo("handSituation", Constant.ORDER.NOT_ACCORD)
                 .andEqualTo("orderId", orderReq.getOrderId());
@@ -116,6 +116,7 @@ public class OrderServiceImpl implements OrderService {
         int[] counts = new int[userOrders.size()];
         int tempNum = 0;
         boolean flag = true;
+        // 判断是否需要改变套餐
         if (userOrders.size() >= Integer.valueOf(configs.getSysValue())) {
             for (UserOrder tempUserOrder : userOrders) {
                 if (tempUserOrder.getHandSituation().equals(Constant.ORDER.NOT_ACCORD)) {
@@ -135,6 +136,7 @@ public class OrderServiceImpl implements OrderService {
             }
             for (int j = 0; j < counts.length; j++) {
                 if (counts[j] >= Integer.valueOf(configs.getSysValue())) {
+                    // 获取主套餐、副套餐配置
                     String[] needChangeRemark = remarks[j].split("&");
                     if (needChangeRemark.length != 2) {
                         LOG.info("备注信息有误：" + remarks[j]);
@@ -159,17 +161,15 @@ public class OrderServiceImpl implements OrderService {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listOtherOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listOtherOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listOtherOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         } else {
             if (AuthCurrentUser.get().getUserInfo().getRoleType().equals(Constant.USER.ADMIN)) {
                 orders = orderDao.listWaitOrder(queryReq, null);
             } else {
-                orders =
-                        orderDao.listWaitOrder(queryReq, AuthCurrentUser.get().getUserInfo()
-                                .getJobNumber());
+                orders = orderDao.listWaitOrder(queryReq,
+                        AuthCurrentUser.get().getUserInfo().getJobNumber());
             }
         }
         List<Area> areas = areaDao.selectAll();
@@ -277,6 +277,7 @@ public class OrderServiceImpl implements OrderService {
         for (MobileOrder order : orders) {// excel中新数据
             boolean flag = true;
             for (MobileOrder addOrder : addOrders) {
+                // 合并数据
                 if (order.getMobileNumber().equals(addOrder.getMobileNumber())) {
                     if (!StringUtils.isEmpty(order.getMainMeal())) {
                         addOrder.setMainMeal(order.getMainMeal());
@@ -334,9 +335,8 @@ public class OrderServiceImpl implements OrderService {
             // }
             orderDao.insertListOnUpdate(addOrders);
         }
-        String msg =
-                Strman.append("本次导入数据共" + orders.size(), "条，其中新数据" + addNums, "条，合并数据" + meragNum,
-                        "条，敏感数据" + sensitiveNum, "条。");
+        String msg = Strman.append("本次导入数据共" + orders.size(), "条，其中新数据" + addNums,
+                "条，合并数据" + meragNum, "条，敏感数据" + sensitiveNum, "条。");
         LOG.info(msg);
         return ReturnInfo.createReturnSuccessOne(msg);
     }
@@ -426,9 +426,8 @@ public class OrderServiceImpl implements OrderService {
         cal.setTime(new Date());
         long nowTime = cal.getTimeInMillis();
         for (SysConfig tempConfig : configs) {
-            long newTime =
-                    nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
-                            * Constant.TIME.oneHourMillisecond;
+            long newTime = nowTime - Integer.valueOf(tempConfig.getSysValue()) * 24
+                    * Constant.TIME.oneHourMillisecond;
             Date date2 = new Date(newTime);
             switch (tempConfig.getId()) {
                 case Constant.SYS_CONFIG.RECIEVE_TIME_ID:
@@ -447,9 +446,8 @@ public class OrderServiceImpl implements OrderService {
         if (AuthCurrentUser.isManager()) {
             orders = orderDao.recieveListOrderAdmin(receiveOrderReq);
         } else {
-            orders =
-                    orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
-                            successTime);
+            orders = orderDao.recieveListOrder(receiveOrderReq, recieveIntervalTime, notSuccessTime,
+                    successTime);
         }
         List<Area> areas = areaDao.selectAll();
         for (MobileOrderDto mobileOrder : orders) {
@@ -486,7 +484,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ReturnInfo orderCount(CountReq countReq) {
-        PageHelper.startPage(countReq.getPageNo(), countReq.getPageSize());
+        // PageHelper.startPage(countReq.getPageNo(), countReq.getPageSize());
         switch (AuthCurrentUser.getUserInfo().getRoleType()) {
             case Constant.USER.DEPARTMENT_ADMIN:
                 countReq.setDepartmentId(AuthCurrentUser.getDepartMentId());
@@ -507,7 +505,7 @@ public class OrderServiceImpl implements OrderService {
         int successNum = 0;
         int totalPriceDiff = 0;
         for (UserOrderQueryInfo userOrder : userOrderQueryInfos) {
-            System.out.println(userOrder.toString());
+            // System.out.println(userOrder.toString());
             totalPriceDiff += userOrder.getPriceDifference();
             if (userOrder.getHandSituation().equals(Constant.ORDER.SUCCESS)) {
                 successNum++;
