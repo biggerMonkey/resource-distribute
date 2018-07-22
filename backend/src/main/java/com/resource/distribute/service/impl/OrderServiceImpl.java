@@ -484,7 +484,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public ReturnInfo orderCount(CountReq countReq) {
-        // PageHelper.startPage(countReq.getPageNo(), countReq.getPageSize());
         switch (AuthCurrentUser.getUserInfo().getRoleType()) {
             case Constant.USER.DEPARTMENT_ADMIN:
                 countReq.setDepartmentId(AuthCurrentUser.getDepartMentId());
