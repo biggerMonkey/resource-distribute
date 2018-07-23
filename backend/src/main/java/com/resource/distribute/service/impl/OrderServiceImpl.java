@@ -48,6 +48,7 @@ import com.resource.distribute.entity.User;
 import com.resource.distribute.entity.UserOrder;
 import com.resource.distribute.service.OrderService;
 import com.resource.distribute.utils.AuthCurrentUser;
+import com.resource.distribute.utils.SimpleStringUtils;
 
 import strman.Strman;
 import tk.mybatis.mapper.entity.Example;
@@ -112,43 +113,15 @@ public class OrderServiceImpl implements OrderService {
         if (configs == null) {
             return ReturnInfo.createReturnSuccessOne(CodeEnum.DATA_INVALID);
         }
-        String[] remarks = new String[userOrders.size()];
-        int[] counts = new int[userOrders.size()];
-        int tempNum = 0;
-        boolean flag = true;
         // 判断是否需要改变套餐
         if (userOrders.size() >= Integer.valueOf(configs.getSysValue())) {
-            for (UserOrder tempUserOrder : userOrders) {
-                if (tempUserOrder.getHandSituation().equals(Constant.ORDER.NOT_ACCORD)) {
-                    for (int i = 0; i < remarks.length; i++) {
-                        if (tempUserOrder.getRemarks().equals(remarks[i])) {
-                            counts[i]++;
-                            flag = false;
-                        }
-                    }
-                    if (flag) {
-                        remarks[tempNum] = tempUserOrder.getRemarks();
-                        counts[tempNum]++;
-                        tempNum++;
-                        flag = true;
-                    }
-                }
-            }
-            for (int j = 0; j < counts.length; j++) {
-                if (counts[j] >= Integer.valueOf(configs.getSysValue())) {
-                    // 获取主套餐、副套餐配置
-                    String[] needChangeRemark = remarks[j].split("&");
-                    if (needChangeRemark.length != 2) {
-                        LOG.info("备注信息有误：" + remarks[j]);
-                        continue;
-                    }
-                    MobileOrder mobileOrder = new MobileOrder();
-                    mobileOrder.setId(orderReq.getOrderId());
-                    mobileOrder.setMainMeal(needChangeRemark[0]);
-                    mobileOrder.setSecondMeal(needChangeRemark[1]);
-                    orderDao.updateByPrimaryKeySelective(mobileOrder);
-                }
-            }
+            MobileOrder mobileOrder = new MobileOrder();
+            mobileOrder.setId(orderReq.getOrderId());
+            mobileOrder.setMainMeal(orderReq.getMainCourse());
+            mobileOrder.setSecondMeal(orderReq.getPairCourse());
+            orderDao.updateByPrimaryKeySelective(mobileOrder);
+            LOG.info("单子id" + orderReq.getOrderId() + "更新主副套餐为：" + orderReq.getMainCourse() + " "
+                    + orderReq.getPairCourse());
         }
         return ReturnInfo.createReturnSuccessOne(null);
     }
@@ -393,30 +366,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private List<MobileOrderDto> searchOrder(ReceiveOrderReq receiveOrderReq) {
-        // if (!StringUtils.isEmpty(receiveOrderReq.getUpValue())) {
-        // String upValue = receiveOrderReq.getUpValue().trim();
-        // String upNum = "0";
-        // int flag = 0;
-        // for (int i = 0; i < upValue.length(); i++) {
-        // if (upValue.charAt(i) >= 48 && upValue.charAt(i) <= 57) {
-        // upNum += upValue.charAt(i);
-        // } else {
-        // flag = i;
-        // break;
-        // }
-        // }
-        // Integer startValue = Integer.valueOf(upNum);
-        // if (upValue.indexOf("上") != -1) {
-        // receiveOrderReq.setStartValue(startValue);
-        // } else if (upValue.indexOf("下") != -1) {
-        // receiveOrderReq.setEndValue(startValue);
-        // } else {
-        // int endValue =
-        // Integer.valueOf(upValue.split(String.valueOf(upValue.charAt(flag)))[1]);
-        // receiveOrderReq.setStartValue(startValue);
-        // receiveOrderReq.setEndValue(endValue);
-        // }
-        // }
         String recieveIntervalTime = "1900-01-01 00:00:00";
         String notSuccessTime = "1900-01-01 00:00:00";
         String successTime = "1900-01-01 00:00:00";
@@ -443,6 +392,29 @@ public class OrderServiceImpl implements OrderService {
         }
         PageHelper.startPage(receiveOrderReq.getPageNo(), receiveOrderReq.getPageSize());
         List<MobileOrderDto> orders = new ArrayList<MobileOrderDto>();
+        String fixedStr = "任我用";
+        if (receiveOrderReq.getMainMealSelect() != null
+                && receiveOrderReq.getMainMealSelect().length == 1) {
+            if (receiveOrderReq.getMainMealSelect()[0].indexOf(fixedStr) >= 0) {
+                receiveOrderReq.setMainMeal("%" + fixedStr + "%");
+            } else {
+                receiveOrderReq.setMainMeal("%" + receiveOrderReq.getMainMealSelect()[0] + "%");
+            }
+        } else if (receiveOrderReq.getMainMealSelect() != null
+                && receiveOrderReq.getMainMealSelect().length == 2) {
+            if (receiveOrderReq.getMainMealSelect()[0].indexOf(fixedStr) >= 0
+                    || receiveOrderReq.getMainMealSelect()[0].indexOf(fixedStr) >= 0) {
+                receiveOrderReq.setMainMeal("%" + fixedStr + "%");
+            } else {
+                receiveOrderReq
+                        .setMainMeal("%"
+                                + receiveOrderReq.getMainMealSelect()[0] + "%" + SimpleStringUtils
+                                        .getFirstNumFromStr(receiveOrderReq.getMainMealSelect()[1])
+                        + "%");
+            }
+        }
+        receiveOrderReq.setSecondMeal(
+                "%" + SimpleStringUtils.getFirstNumFromStr(receiveOrderReq.getSecondMeal()) + "%");
         if (AuthCurrentUser.isManager()) {
             orders = orderDao.recieveListOrderAdmin(receiveOrderReq);
         } else {

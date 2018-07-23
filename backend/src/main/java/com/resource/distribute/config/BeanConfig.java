@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import tk.mybatis.spring.mapper.MapperScannerConfigurer;
-
 import com.alibaba.druid.pool.DruidDataSource;
+
+import tk.mybatis.spring.mapper.MapperScannerConfigurer;
 
 /**
  * <p>
@@ -20,7 +20,8 @@ import com.alibaba.druid.pool.DruidDataSource;
  *
  * @author lengrongfu
  * @create 2018年01月12日上午8:03
- * @see </P>
+ * @see
+ *      </P>
  */
 @Configuration
 public class BeanConfig {
@@ -49,10 +50,8 @@ public class BeanConfig {
     @Primary
     public DataSource getDataSource() {
         DruidDataSource dataSource = new DruidDataSource();
-        dataSource
-                .setUrl("jdbc:mysql://"
-                        + System.getProperty("db.host")
-                        + ":3306/resource_distribute?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=GMT&allowMultiQueries=true&useSSL=false");
+        dataSource.setUrl("jdbc:mysql://" + System.getProperty("db.host")
+                + "/resource_distribute?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=GMT&allowMultiQueries=true&useSSL=false");
         dataSource.setUsername(System.getProperty("db.username"));
         dataSource.setPassword(System.getProperty("db.password"));
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");

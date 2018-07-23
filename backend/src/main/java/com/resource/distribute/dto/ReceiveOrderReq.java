@@ -13,6 +13,7 @@ public class ReceiveOrderReq {
     private Integer broadband;// 1->是 2->否
     private String mobileNumber;// 手机号
     private Integer orderNum;// 领取单子数量
+    private String[] mainMealSelect;
     private int pageSize = Constant.PAGE.DEFAULT_PAGE_SIZE;
     private int pageNo = Constant.PAGE.DEFAULT_PAGE_NUM;
 
@@ -80,4 +81,11 @@ public class ReceiveOrderReq {
         this.pageSize = pageSize;
     }
 
+    public String[] getMainMealSelect() {
+        return mainMealSelect;
+    }
+
+    public void setMainMealSelect(String[] mainMealSelect) {
+        this.mainMealSelect = mainMealSelect;
+    }
 }
