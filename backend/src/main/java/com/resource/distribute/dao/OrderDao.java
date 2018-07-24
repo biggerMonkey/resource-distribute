@@ -42,7 +42,7 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
             @Param("jobNumber") String jobNumber);
 
 
-    @Select("<script>SELECT * FROM mobile_order mo LEFT JOIN user_order uo ON mo.id=uo.order_id "
+    @Select("<script>SELECT DISTINCT mo.id AS tempId,mo.* FROM mobile_order mo LEFT JOIN user_order uo ON mo.id=uo.order_id "
             + "<where>"
             + "<if test='receiveOrderReq.areaId != null'> "
             + " AND mo.area_id=#{receiveOrderReq.areaId} </if>"
@@ -65,7 +65,7 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
             @Param("recieveIntervalTime") String recieveIntervalTime,
             @Param("notSuccessTime") String notSuccessTime, @Param("successTime") String successTime);
 
-    @Select("<script>SELECT * FROM mobile_order mo LEFT JOIN user_order uo ON mo.id=uo.order_id "
+    @Select("<script>SELECT DISTINCT mo.id AS tempId,mo.* FROM mobile_order mo LEFT JOIN user_order uo ON mo.id=uo.order_id "
             + "<where>"
             + "<if test='receiveOrderReq.areaId != null'> "
             + " AND mo.area_id=#{receiveOrderReq.areaId} </if>"
