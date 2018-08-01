@@ -30,6 +30,7 @@ import com.resource.distribute.common.Constant;
 import com.resource.distribute.common.ReturnInfo;
 import com.resource.distribute.dao.AreaDao;
 import com.resource.distribute.dao.OrderDao;
+import com.resource.distribute.dao.OrderRecieveRecordDao;
 import com.resource.distribute.dao.RecordDao;
 import com.resource.distribute.dao.SysConfigDao;
 import com.resource.distribute.dao.UserOrderDao;
@@ -42,6 +43,7 @@ import com.resource.distribute.dto.ReceiveOrderReq;
 import com.resource.distribute.dto.UserOrderQueryInfo;
 import com.resource.distribute.entity.Area;
 import com.resource.distribute.entity.MobileOrder;
+import com.resource.distribute.entity.OrderRecieveRecord;
 import com.resource.distribute.entity.Record;
 import com.resource.distribute.entity.SysConfig;
 import com.resource.distribute.entity.User;
@@ -76,6 +78,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private UserOrderDao userOrderDao;
 
+    @Autowired
+    private OrderRecieveRecordDao orderRecordDao;
+
     @Override
     @Transactional
     public synchronized ReturnInfo updateOrder(OrderUpdateReq orderReq) {
@@ -83,6 +88,15 @@ public class OrderServiceImpl implements OrderService {
         if (orderReq.getOrderId() == null) {
             return ReturnInfo.create(CodeEnum.REQUEST_PARAM_ERROR);
         }
+        OrderRecieveRecord orderRecieveRecord = new OrderRecieveRecord();
+        orderRecieveRecord.setOrderId(orderReq.getOrderId());
+        orderRecieveRecord.setHandSituation(orderReq.getHandSituation().trim());
+        orderRecieveRecord.setMainMeal(orderReq.getMainCourse());
+        orderRecieveRecord.setSecondMeal(orderReq.getPairCourse());
+        Example recordExample = new Example(OrderRecieveRecord.class);
+        recordExample.createCriteria().andEqualTo("orderId", orderReq.getOrderId());
+        orderRecordDao.updateByExampleSelective(orderRecieveRecord, recordExample);
+
         userOrder.setOrderId(orderReq.getOrderId());
         userOrder.setUserId(AuthCurrentUser.getUserId());
         userOrder.setOrderState(orderReq.getState());
@@ -113,8 +127,19 @@ public class OrderServiceImpl implements OrderService {
         if (configs == null) {
             return ReturnInfo.createReturnSuccessOne(CodeEnum.DATA_INVALID);
         }
+        if (StringUtils.isEmpty(orderReq.getMainCourse())) {
+            return ReturnInfo.createReturnSuccessOne(null);
+        }
+        int num = 0;
+        for (UserOrder temp : userOrders) {
+            if (temp.getMainCourse().equals(orderReq.getMainCourse())
+                    && temp.getPairCourse().equals(orderReq.getPairCourse())
+                    && !temp.getUserId().equals(AuthCurrentUser.getUserId())) {
+                num++;
+            }
+        }
         // 判断是否需要改变套餐
-        if (userOrders.size() >= Integer.valueOf(configs.getSysValue())) {
+        if (num >= Integer.valueOf(configs.getSysValue())) {
             MobileOrder mobileOrder = new MobileOrder();
             mobileOrder.setId(orderReq.getOrderId());
             mobileOrder.setMainMeal(orderReq.getMainCourse());
@@ -321,6 +346,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public synchronized ReturnInfo receiveOrder(ReceiveOrderReq receiveOrderReq) {
         Example example = new Example(UserOrder.class);
         example.createCriteria().andEqualTo("handSituation", Constant.ORDER.DEFAULT_SISUATION)
@@ -335,6 +361,7 @@ public class OrderServiceImpl implements OrderService {
         User user = AuthCurrentUser.get().getUserInfo();
         String orderIds = "";
         List<UserOrder> insertOrder = new ArrayList<UserOrder>();
+        List<OrderRecieveRecord> orderRecieveRecords = new ArrayList<OrderRecieveRecord>();
         for (MobileOrderDto order : orders) {
             UserOrder userOrder = new UserOrder();
             userOrder.setUserId(user.getId());
@@ -342,7 +369,8 @@ public class OrderServiceImpl implements OrderService {
             userOrder.setJobNumber(user.getJobNumber());
             userOrder.setUserName(user.getUserName());
             userOrder.setMobileJobNumber(AuthCurrentUser.getMobileJobNum());
-            userOrder.setReceiveTime(new Date());
+            Date now = new Date();
+            userOrder.setReceiveTime(now);
             userOrder.setHandSituation(Constant.ORDER.DEFAULT_SISUATION);
             userOrder.setDevId(AuthCurrentUser.getDepartMentId());
             userOrder.setMainCourse("");
@@ -353,14 +381,21 @@ public class OrderServiceImpl implements OrderService {
             userOrder.setCreateBy(AuthCurrentUser.getUserId());
             userOrder.setRemarks("");
             userOrder.setOrderState("");
-            Date now = new Date();
             userOrder.setCreateTime(now);
             userOrder.setUpdateTime(now);
             insertOrder.add(userOrder);
             // userOrderDao.insertSelective(userOrder);
             orderIds += order.getId() + " ";
+            OrderRecieveRecord orderRecieveRecord = new OrderRecieveRecord();
+            orderRecieveRecord.setOrderId(order.getId());
+            orderRecieveRecord.setHandSituation(Constant.ORDER.DEFAULT_SISUATION);
+            orderRecieveRecord.setReceiveTime(now);
+            orderRecieveRecord.setMainMeal("");
+            orderRecieveRecord.setSecondMeal("");
+            orderRecieveRecords.add(orderRecieveRecord);
         }
         userOrderDao.insertList(insertOrder);
+        orderRecordDao.insertListOnUpdate(orderRecieveRecords);
         insertRecord("领取单子:数量->" + orders.size() + " 单子id->" + orderIds, null);
         return ReturnInfo.createReturnSuccessOne(orders.size());
     }

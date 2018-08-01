@@ -56,9 +56,9 @@ public interface OrderDao extends Mapper<MobileOrder>, InsertListMapper<MobileOr
             + "   AND mo.broadband ='' </if>"
             + "<if test='receiveOrderReq.mobileNumber != null'>"
             + "   AND mobile_number like concat(concat('%',#{receiveOrderReq.mobileNumber}),'%') </if> "
-            + " AND (uo.order_id IN(SELECT order_id FROM user_order WHERE receive_time &lt;= #{recieveIntervalTime} AND hand_situation ='待拨打' )"
-            + " OR uo.order_id IN(SELECT order_id FROM user_order WHERE receive_time &lt;= #{notSuccessTime} AND hand_situation !='待拨打' AND hand_situation!='成功')"
-            + " OR uo.order_id IN(SELECT order_id FROM user_order WHERE receive_time &lt;= #{successTime} AND hand_situation='成功')"
+            + " AND (uo.order_id IN(SELECT order_id FROM order_recieve_record WHERE receive_time &lt;= #{recieveIntervalTime} AND hand_situation ='待拨打' )"
+            + " OR uo.order_id IN(SELECT order_id FROM order_recieve_record WHERE receive_time &lt;= #{notSuccessTime} AND hand_situation !='待拨打' AND hand_situation!='成功')"
+            + " OR uo.order_id IN(SELECT order_id FROM order_recieve_record WHERE receive_time &lt;= #{successTime} AND hand_situation='成功')"
             + " OR uo.job_number IS NULL)  AND is_sensitive=1  </where>  ORDER BY uo.`create_time`,uo.receive_time</script>")
     public List<MobileOrderDto> recieveListOrder(
             @Param("receiveOrderReq") ReceiveOrderReq receiveOrderReq,
